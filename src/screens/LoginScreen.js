@@ -67,7 +67,7 @@ const LoginScreen = ({ onLogin, onNavigate }) => {
                     <img 
                         src="/workly_logo.png" 
                         alt="Workly Logo" 
-                        className="w-20 h-20 mb-4" 
+                        className="w-40 h-40 mb-4" 
                         onError={(e) => {
                             // Fallback si la imagen no se carga (útil para desarrollo)
                             e.target.onerror = null; 
@@ -115,7 +115,7 @@ const LoginScreen = ({ onLogin, onNavigate }) => {
                     
                     <div className="text-center text-sm mt-4 space-y-3">
                         <button type="button" onClick={handleForgotPassword} className="text-[#1ABC9C] hover:text-[#16A085] block transition font-medium focus:outline-none focus:ring-2 focus:ring-[#1ABC9C] focus:ring-offset-2">
-                                 ¿Olvidaste tu contraseña?
+                                            ¿Olvidaste tu contraseña?
                         </button>
                         
                         <p className="text-gray-500">
