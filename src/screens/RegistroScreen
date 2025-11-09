@@ -1,0 +1,190 @@
+import React, { useState } from 'react';
+import { Mail, Lock, User, UserPlus, ArrowLeft, Loader2, Eye, EyeOff, CheckCircle } from 'lucide-react'; 
+
+// --- Componente de Botón Integrado (Reutilizado del LoginScreen) ---
+const CustomPrimaryButton = ({ children, disabled, type, color = 'bg-[#1ABC9C]' }) => (
+    <button
+        type={type}
+        disabled={disabled}
+        className={`w-full py-3 px-4 rounded-xl font-bold text-white transition-all duration-200 shadow-lg 
+            ${disabled
+                ? 'bg-gray-400 cursor-not-allowed shadow-none'
+                : `${color} hover:opacity-90 active:opacity-75 transform hover:scale-[1.01] shadow-emerald-400/50`
+            }`}
+    >
+        {children}
+    </button>
+);
+// ----------------------------------------------------------------------------------------
+
+// Se espera una prop onNavigate para volver al login
+const RegistroScreen = ({ onNavigate }) => { 
+    const [name, setName] = useState(''); 
+    const [email, setEmail] = useState(''); 
+    const [password, setPassword] = useState(''); 
+    const [confirmPassword, setConfirmPassword] = useState(''); 
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(''); 
+    const [showPassword, setShowPassword] = useState(false);
+    const [isRegistered, setIsRegistered] = useState(false); // Nuevo estado para el mensaje de éxito
+
+    const handleRegister = (e) => {
+        e.preventDefault();
+        setError('');
+        setIsRegistered(false);
+
+        if (password !== confirmPassword) {
+            setError('Las contraseñas no coinciden.');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('La contraseña debe tener al menos 6 caracteres.');
+            return;
+        }
+
+        setIsLoading(true); 
+        
+        // Simulación de latencia de red (registro exitoso)
+        setTimeout(() => {
+            setIsLoading(false);
+            
+            // Simulación de Notificación de Registro Exitoso
+            setIsRegistered(true);
+            console.log("¡Usuario registrado con éxito!");
+
+            // Opcional: Redirigir al login después de un tiempo
+            setTimeout(() => {
+                if (onNavigate) {
+                    onNavigate('login');
+                }
+            }, 3000);
+
+        }, 1500); 
+    };
+
+    if (isRegistered) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100 font-sans">
+                <div className="w-full max-w-sm bg-white p-10 rounded-3xl shadow-3xl border border-gray-200 text-center">
+                    <CheckCircle className="w-16 h-16 text-[#1ABC9C] mx-auto mb-4" />
+                    <h2 className="text-3xl font-bold text-[#17202A] mb-2">¡Registro Exitoso!</h2>
+                    <p className="text-gray-600 mb-6">
+                        ¡Bienvenido a Workly! Serás redirigido al inicio de sesión en breve.
+                    </p>
+                    <button 
+                        onClick={() => onNavigate('login')}
+                        className="text-[#F39C12] hover:text-[#E67E22] font-semibold flex items-center justify-center mx-auto transition"
+                    >
+                        <ArrowLeft className="w-4 h-4 mr-1" /> Volver al Login
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100 font-sans">
+            <div className="w-full max-w-sm bg-white p-8 pt-10 rounded-3xl shadow-3xl border border-gray-200">
+                
+                {/* Botón de volver */}
+                <button 
+                    onClick={() => onNavigate('login')}
+                    className="flex items-center text-sm font-semibold text-gray-500 hover:text-[#17202A] transition mb-6"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-1" /> Volver al Login
+                </button>
+
+                {/* TÍTULO Y ESLOGAN */}
+                <div className="flex flex-col items-center mb-8">
+                    <h1 className="text-3xl font-extrabold text-[#F39C12] mb-2">Crear Cuenta</h1>
+                    <p className="text-gray-500 text-center text-base font-medium">
+                        Únete a Workly y encuentra tu próxima oportunidad.
+                    </p> 
+                </div>
+
+                <form onSubmit={handleRegister} className="space-y-6">
+                    
+                    {/* CAMPO DE NOMBRE */}
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input 
+                            type="text" 
+                            placeholder="Nombre completo" 
+                            value={name} 
+                            onChange={(e) => setName(e.target.value)} 
+                            className="w-full p-3 pl-10 border border-gray-300 rounded-xl focus:border-[#F39C12] focus:ring-[#F39C12] focus:ring-1 transition" 
+                            required
+                        />
+                    </div>
+
+                    {/* CAMPO DE CORREO */}
+                    <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input 
+                            type="email" 
+                            placeholder="Correo electrónico" 
+                            value={email} 
+                            onChange={(e) => setEmail(e.target.value)} 
+                            className="w-full p-3 pl-10 border border-gray-300 rounded-xl focus:border-[#F39C12] focus:ring-[#F39C12] focus:ring-1 transition" 
+                            required
+                        />
+                    </div>
+                    
+                    {/* CAMPO DE CONTRASEÑA */}
+                    <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input 
+                            type={showPassword ? 'text' : 'password'} 
+                            placeholder="Contraseña (mín. 6 caracteres)" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                            className="w-full p-3 pl-10 pr-12 border border-gray-300 rounded-xl focus:border-[#F39C12] focus:ring-[#F39C12] focus:ring-1 transition" 
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-500 hover:text-[#17202A] transition"
+                            aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                    </div>
+
+                    {/* CAMPO DE CONFIRMAR CONTRASEÑA */}
+                    <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input 
+                            type={showPassword ? 'text' : 'password'} 
+                            placeholder="Confirmar contraseña" 
+                            value={confirmPassword} 
+                            onChange={(e) => setConfirmPassword(e.target.value)} 
+                            className="w-full p-3 pl-10 pr-12 border border-gray-300 rounded-xl focus:border-[#F39C12] focus:ring-[#F39C12] focus:ring-1 transition" 
+                            required
+                        />
+                    </div>
+
+                    {error && <div className="text-sm text-center text-red-600 font-medium bg-red-50 p-2 rounded-lg border border-red-300 mt-2">{error}</div>}
+
+                    {/* BOTÓN DE REGISTRO */}
+                    <CustomPrimaryButton type="submit" disabled={isLoading} color="bg-[#F39C12]">
+                        {isLoading ? (
+                            <div className="flex items-center justify-center">
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                Registrando...
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center">
+                                <UserPlus className="w-5 h-5 mr-2" />
+                                Registrarme
+                            </div>
+                        )}
+                    </CustomPrimaryButton>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default RegistroScreen;
