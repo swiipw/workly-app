@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
     Mail, Briefcase, Star, Clock, Heart, Edit3, Camera, User, 
-    BookOpen, LogOut, Save, X, Plus, Check, Zap, ArrowLeft, Calendar, FileText, Upload, BarChart3
+    BookOpen, LogOut, Save, X, Plus, Check, Zap, ArrowLeft, Calendar, FileText, Upload 
 } from 'lucide-react'; 
 
 // --- SIMULACIÓN DE RECHARTS (Componentes de Gráfica) ---
@@ -639,175 +639,8 @@ const EditProfileForm = ({ user, initialPreferences, initialSkills, onSave, onCa
 
 
 // Componente de la Pantalla de Perfil (Modo Visualización)
-const ProfileScreen = ({ user, simulatedData, onLogout, onEditStart, onViewCertificates, onViewLearningHours, onImageChange }) => {
-    const username = generateUsername(user.name); 
-
-    const TagList = ({ items, emptyMessage, borderColor }) => (
-        <div className="flex flex-wrap gap-2">
-            {items.length > 0 ? (
-                 items.map((item, index) => (
-                    <span 
-                        key={index} 
-                        className={`
-                            px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium border shadow-sm
-                            ${borderColor}
-                        `}
-                    >
-                        {item}
-                    </span>
-                ))
-            ) : (
-                <p className="text-gray-500 italic text-sm">{emptyMessage}</p>
-            )}
-        </div>
-    );
-
-
-    return (
-        <div className="p-4 space-y-6">
-
-            {/* 1. SECCIÓN DE INFORMACIÓN BÁSICA Y FOTO */}
-            <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-xl border-t-8 border-[#1ABC9C]/80">
-                
-                <div className="relative mb-4">
-                    <img 
-                        // Usa la URL del estado, que puede ser la URL temporal de la carga
-                        src={user.profileImageUrl}
-                        alt="Foto de Perfil"
-                        className="w-32 h-32 object-cover rounded-full border-4 border-gray-100 shadow-lg"
-                    />
-                    
-                    {/* INPUT OCULTO para seleccionar archivo */}
-                    <input
-                        type="file"
-                        id="profile-image-upload"
-                        className="hidden"
-                        accept="image/*"
-                        // Llama al manejador cuando se selecciona un archivo
-                        onChange={(e) => onImageChange(e.target.files[0])} 
-                    />
-
-                    {/* ETIQUETA/BOTÓN visible que activa el input oculto */}
-                    <label
-                        htmlFor="profile-image-upload"
-                        className="absolute bottom-0 right-0 p-2 bg-[#F39C12] text-white rounded-full hover:bg-[#E67E22] transition shadow-lg ring-4 ring-white cursor-pointer"
-                        aria-label="Cambiar foto"
-                    >
-                        <Camera className="w-5 h-5" />
-                    </label>
-                </div>
-
-                <h2 className="text-3xl font-extrabold text-[#17202A] mt-2">{user.name}</h2>
-                <p className="text-gray-500 text-lg mb-4">@{username}</p>
-                
-                <div className="w-full space-y-3 text-gray-700 max-w-sm">
-                    <p className="flex items-center text-md font-medium">
-                        <Mail className="w-5 h-5 mr-3 text-[#1ABC9C]" /> {user.email}
-                    </p>
-                    <p className="flex items-center text-md font-medium">
-                        <User className="w-5 h-5 mr-3 text-[#1ABC9C]" /> {user.age} años 
-                    </p>
-                </div>
-                
-                <button 
-                    onClick={onEditStart} 
-                    className="mt-4 flex items-center px-4 py-2 text-[#1ABC9C] border border-[#1ABC9C] rounded-full text-sm font-semibold hover:bg-[#1ABC9C] hover:text-white transition-all"
-                >
-                    <Edit3 className="w-4 h-4 mr-2" /> 
-                    Editar Datos
-                </button>
-            </div>
-            
-            {/* 2. HABILIDADES TÉCNICAS */}
-            <section className="bg-white p-6 rounded-xl shadow-xl">
-                <div className="flex justify-between items-center mb-4 border-b pb-3">
-                    <h3 className="text-xl font-bold text-[#17202A] flex items-center">
-                        <Zap className="w-6 h-6 mr-2 text-blue-500" /> Habilidades Técnicas
-                    </h3>
-                    <button 
-                        onClick={onEditStart} 
-                        className="text-[#1ABC9C] hover:text-[#17202A] p-2 rounded-full hover:bg-gray-100 transition"
-                        aria-label="Editar habilidades"
-                    >
-                        <Edit3 className="w-5 h-5" />
-                    </button>
-                </div>
-                <TagList 
-                    items={user.skills} 
-                    emptyMessage="Añade tus habilidades para destacar."
-                    borderColor="border-blue-200"
-                />
-            </section>
-
-            {/* 3. GUSTOS Y PREFERENCIAS */}
-            <section className="bg-white p-6 rounded-xl shadow-xl">
-                <div className="flex justify-between items-center mb-4 border-b pb-3">
-                    <h3 className="text-xl font-bold text-[#17202A] flex items-center">
-                        <Heart className="w-6 h-6 mr-2 text-red-500" /> Preferencias de Empleo
-                    </h3>
-                    <button 
-                        onClick={onEditStart} 
-                        className="text-[#1ABC9C] hover:text-[#17202A] p-2 rounded-full hover:bg-gray-100 transition"
-                        aria-label="Editar preferencias"
-                    >
-                        <Edit3 className="w-5 h-5" />
-                    </button>
-                </div>
-                <TagList 
-                    items={user.preferences} 
-                    emptyMessage="No has seleccionado preferencias aún."
-                    borderColor="border-red-200"
-                />
-            </section>
-
-            {/* 4. MI TRAYECTORIA ACADÉMICA / PROFESIONAL */}
-            <section className="bg-white p-6 rounded-xl shadow-xl">
-                <h3 className="text-xl font-bold text-[#17202A] mb-5 flex items-center"><Briefcase className="w-6 h-6 mr-2 text-[#F39C12]" /> Mi Trayectoria</h3>
-                
-                <div className="space-y-4">
-                    <div 
-                        onClick={onViewCertificates}
-                        className="flex justify-between items-center p-3 bg-blue-50/50 rounded-lg border-l-4 border-blue-500 cursor-pointer hover:bg-blue-100 transition shadow-sm"
-                    >
-                        <p className="flex items-center text-gray-700 font-semibold">
-                            <BookOpen className="w-5 h-5 mr-3 text-blue-500" /> 
-                            Cursos Completados:
-                        </p>
-                        <span className="font-extrabold text-xl text-blue-700">{user.certificates.length}</span>
-                    </div>
-
-                    <div 
-                        onClick={onViewLearningHours}
-                        className="flex justify-between items-center p-3 bg-green-50/50 rounded-lg border-l-4 border-green-500 cursor-pointer hover:bg-green-100 transition shadow-sm"
-                    >
-                        <p className="flex items-center text-gray-700 font-semibold"><Clock className="w-5 h-5 mr-3 text-green-500" /> Horas de Aprendizaje:</p>
-                        <span className="font-extrabold text-xl text-green-700">{simulatedData.career.totalHours}h</span>
-                    </div>
-                    
-                    <div className="border-t pt-4">
-                        <p className="text-gray-700 font-semibold mb-2 flex items-center"><Star className="w-5 h-5 mr-2 text-[#F39C12]" /> Rendimiento (Promedio de Estrellas):</p>
-                        <StarRating rating={simulatedData.career.performanceRating} />
-                    </div>
-                </div>
-            </section>
-
-            <div className="pt-4 pb-8">
-                <button
-                    onClick={onLogout}
-                    className="w-full py-3 flex items-center justify-center bg-red-600/90 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition transform hover:scale-[1.01]"
-                >
-                    <LogOut className="w-5 h-5 mr-2" />
-                    Cerrar Sesión
-                </button>
-            </div>
-            
-        </div>
-    );
-};
-
-// Componente principal de la aplicación
-const App = () => {
-    const [user, setUser] = useState(INITIAL_USER_DATA);
+const ProfileScreen = ({ initialUserData, initialSimulatedData }) => {
+    const [user, setUser] = useState(initialUserData);
     const [view, setView] = useState('profile');
 
     const handleLogout = () => {
@@ -850,7 +683,174 @@ const App = () => {
             console.log("Nueva imagen de perfil seleccionada:", file.name);
         }
     };
+    
+    // Función de renderizado para el modo de visualización del perfil
+    const ProfileView = () => {
+        const username = generateUsername(user.name); 
 
+        const TagList = ({ items, emptyMessage, borderColor }) => (
+            <div className="flex flex-wrap gap-2">
+                {items.length > 0 ? (
+                    items.map((item, index) => (
+                        <span 
+                            key={index} 
+                            className={`
+                                px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium border shadow-sm
+                                ${borderColor}
+                            `}
+                        >
+                            {item}
+                        </span>
+                    ))
+                ) : (
+                    <p className="text-gray-500 italic text-sm">{emptyMessage}</p>
+                )}
+            </div>
+        );
+
+
+        return (
+            <div className="p-4 space-y-6">
+
+                {/* 1. SECCIÓN DE INFORMACIÓN BÁSICA Y FOTO */}
+                <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-xl border-t-8 border-[#1ABC9C]/80">
+                    
+                    <div className="relative mb-4">
+                        <img 
+                            // Usa la URL del estado, que puede ser la URL temporal de la carga
+                            src={user.profileImageUrl}
+                            alt="Foto de Perfil"
+                            className="w-32 h-32 object-cover rounded-full border-4 border-gray-100 shadow-lg"
+                        />
+                        
+                        {/* INPUT OCULTO para seleccionar archivo */}
+                        <input
+                            type="file"
+                            id="profile-image-upload"
+                            className="hidden"
+                            accept="image/*"
+                            // Llama al manejador cuando se selecciona un archivo
+                            onChange={(e) => handleProfileImageChange(e.target.files[0])} 
+                        />
+
+                        {/* ETIQUETA/BOTÓN visible que activa el input oculto */}
+                        <label
+                            htmlFor="profile-image-upload"
+                            className="absolute bottom-0 right-0 p-2 bg-[#F39C12] text-white rounded-full hover:bg-[#E67E22] transition shadow-lg ring-4 ring-white cursor-pointer"
+                            aria-label="Cambiar foto"
+                        >
+                            <Camera className="w-5 h-5" />
+                        </label>
+                    </div>
+
+                    <h2 className="text-3xl font-extrabold text-[#17202A] mt-2">{user.name}</h2>
+                    <p className="text-gray-500 text-lg mb-4">@{username}</p>
+                    
+                    <div className="w-full space-y-3 text-gray-700 max-w-sm">
+                        <p className="flex items-center text-md font-medium">
+                            <Mail className="w-5 h-5 mr-3 text-[#1ABC9C]" /> {user.email}
+                        </p>
+                        <p className="flex items-center text-md font-medium">
+                            <User className="w-5 h-5 mr-3 text-[#1ABC9C]" /> {user.age} años 
+                        </p>
+                    </div>
+                    
+                    <button 
+                        onClick={() => setView('edit')} 
+                        className="mt-4 flex items-center px-4 py-2 text-[#1ABC9C] border border-[#1ABC9C] rounded-full text-sm font-semibold hover:bg-[#1ABC9C] hover:text-white transition-all"
+                    >
+                        <Edit3 className="w-4 h-4 mr-2" /> 
+                        Editar Datos
+                    </button>
+                </div>
+                
+                {/* 2. HABILIDADES TÉCNICAS */}
+                <section className="bg-white p-6 rounded-xl shadow-xl">
+                    <div className="flex justify-between items-center mb-4 border-b pb-3">
+                        <h3 className="text-xl font-bold text-[#17202A] flex items-center">
+                            <Zap className="w-6 h-6 mr-2 text-blue-500" /> Habilidades Técnicas
+                        </h3>
+                        <button 
+                            onClick={() => setView('edit')} 
+                            className="text-[#1ABC9C] hover:text-[#17202A] p-2 rounded-full hover:bg-gray-100 transition"
+                            aria-label="Editar habilidades"
+                        >
+                            <Edit3 className="w-5 h-5" />
+                        </button>
+                    </div>
+                    <TagList 
+                        items={user.skills} 
+                        emptyMessage="Añade tus habilidades para destacar."
+                        borderColor="border-blue-200"
+                    />
+                </section>
+
+                {/* 3. GUSTOS Y PREFERENCIAS */}
+                <section className="bg-white p-6 rounded-xl shadow-xl">
+                    <div className="flex justify-between items-center mb-4 border-b pb-3">
+                        <h3 className="text-xl font-bold text-[#17202A] flex items-center">
+                            <Heart className="w-6 h-6 mr-2 text-red-500" /> Preferencias de Empleo
+                        </h3>
+                        <button 
+                            onClick={() => setView('edit')} 
+                            className="text-[#1ABC9C] hover:text-[#17202A] p-2 rounded-full hover:bg-gray-100 transition"
+                            aria-label="Editar preferencias"
+                        >
+                            <Edit3 className="w-5 h-5" />
+                        </button>
+                    </div>
+                    <TagList 
+                        items={user.preferences} 
+                        emptyMessage="No has seleccionado preferencias aún."
+                        borderColor="border-red-200"
+                    />
+                </section>
+
+                {/* 4. MI TRAYECTORIA ACADÉMICA / PROFESIONAL */}
+                <section className="bg-white p-6 rounded-xl shadow-xl">
+                    <h3 className="text-xl font-bold text-[#17202A] mb-5 flex items-center"><Briefcase className="w-6 h-6 mr-2 text-[#F39C12]" /> Mi Trayectoria</h3>
+                    
+                    <div className="space-y-4">
+                        <div 
+                            onClick={() => setView('certificates')}
+                            className="flex justify-between items-center p-3 bg-blue-50/50 rounded-lg border-l-4 border-blue-500 cursor-pointer hover:bg-blue-100 transition shadow-sm"
+                        >
+                            <p className="flex items-center text-gray-700 font-semibold">
+                                <BookOpen className="w-5 h-5 mr-3 text-blue-500" /> 
+                                Cursos Completados:
+                            </p>
+                            <span className="font-extrabold text-xl text-blue-700">{user.certificates.length}</span>
+                        </div>
+
+                        <div 
+                            onClick={() => setView('learning')}
+                            className="flex justify-between items-center p-3 bg-green-50/50 rounded-lg border-l-4 border-green-500 cursor-pointer hover:bg-green-100 transition shadow-sm"
+                        >
+                            <p className="flex items-center text-gray-700 font-semibold"><Clock className="w-5 h-5 mr-3 text-green-500" /> Horas de Aprendizaje:</p>
+                            <span className="font-extrabold text-xl text-green-700">{initialSimulatedData.career.totalHours}h</span>
+                        </div>
+                        
+                        <div className="border-t pt-4">
+                            <p className="text-gray-700 font-semibold mb-2 flex items-center"><Star className="w-5 h-5 mr-2 text-[#F39C12]" /> Rendimiento (Promedio de Estrellas):</p>
+                            <StarRating rating={initialSimulatedData.career.performanceRating} />
+                        </div>
+                    </div>
+                </section>
+
+                <div className="pt-4 pb-8">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full py-3 flex items-center justify-center bg-red-600/90 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition transform hover:scale-[1.01]"
+                    >
+                        <LogOut className="w-5 h-5 mr-2" />
+                        Cerrar Sesión
+                    </button>
+                </div>
+                
+            </div>
+        );
+    }
+    
 
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center font-[Inter]">
@@ -877,25 +877,25 @@ const App = () => {
                         />
                     ) : view === 'learning' ? (
                         <LearningHoursScreen
-                            data={simulatedData.career.learningData}
-                            totalHours={simulatedData.career.totalHours}
+                            data={initialSimulatedData.career.learningData}
+                            totalHours={initialSimulatedData.career.totalHours}
                             onBack={() => setView('profile')}
                         />
                     ) : (
-                        <ProfileScreen 
-                            user={user} 
-                            simulatedData={simulatedData}
-                            onLogout={handleLogout} 
-                            onEditStart={() => setView('edit')}
-                            onViewCertificates={() => setView('certificates')}
-                            onViewLearningHours={() => setView('learning')}
-                            onImageChange={handleProfileImageChange} // Se pasa el nuevo manejador de imagen
-                        />
+                        <ProfileView />
                     )}
                 </main>
             </div>
         </div>
     );
 };
+
+// Componente Wrapper para manejar datos iniciales
+const AppWrapper = () => (
+    <ProfileScreen 
+        initialUserData={INITIAL_USER_DATA}
+        initialSimulatedData={simulatedData}
+    />
+);
 
 export default ProfileScreen;
