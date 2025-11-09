@@ -22,14 +22,15 @@ const CourseCard = ({ course, onClick, isMyCourse = false }) => (
         onClick={() => onClick(course)} 
         className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300 border-l-4 border-[#F39C12] cursor-pointer"
     >
-         <div className="flex justify-between items-start mb-2">
-             <h3 className="text-xl font-bold text-[#17202A]">{course.title}</h3>
-             
-             {!isMyCourse && (
-                <span className={text-xs font-semibold px-3 py-1 rounded-full ${course.price === 'Gratis' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}}>
+        <div className="flex justify-between items-start mb-2">
+            <h3 className="text-xl font-bold text-[#17202A]">{course.title}</h3>
+            
+            {!isMyCourse && (
+                // 🛑 CORRECCIÓN 1: Se necesitan backticks (`) para el Template Literal.
+                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${course.price === 'Gratis' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
                     {course.price}
                 </span>
-             )}
+            )}
         </div>
         <p className="text-gray-500 mb-3 text-sm italic">{course.category}</p>
         
@@ -38,7 +39,8 @@ const CourseCard = ({ course, onClick, isMyCourse = false }) => (
                 <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
                     <div 
                         className="bg-[#1ABC9C] h-2.5 rounded-full" 
-                        style={{ width: ${course.progress}% }}
+                        // 🛑 CORRECCIÓN 2: Se necesitan backticks (`) para el valor del estilo.
+                        style={{ width: `${course.progress}%` }}
                     ></div>
                 </div>
                 <div className="flex justify-between items-center text-sm font-medium">
@@ -71,6 +73,8 @@ const EnrollmentForm = ({ course, onConfirm, onCancel }) => {
         phone: '',
         country: '',
     });
+    // Nuevo estado para manejar errores de validación sin usar alert()
+    const [validationError, setValidationError] = useState('');
     
     // --- LÓGICA DE AUTO-RELLENO ELIMINADA ---
     // El formulario empieza vacío como lo solicitaste.
@@ -78,15 +82,18 @@ const EnrollmentForm = ({ course, onConfirm, onCancel }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        // Limpiar el error cuando el usuario empieza a escribir
+        setValidationError(''); 
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Validación simple
+        // Validación simple, usando el estado para mostrar el error
         if (!formData.fullName || !formData.email || !formData.country) {
-            alert("Por favor, rellena los campos obligatorios.");
+            setValidationError("Por favor, rellena los campos obligatorios (*).");
             return;
         }
+        setValidationError(''); // Limpiar cualquier error previo
         console.log("Datos de inscripción enviados:", formData);
         onConfirm(course); // Pasa el curso de vuelta al componente padre
     };
@@ -101,6 +108,13 @@ const EnrollmentForm = ({ course, onConfirm, onCancel }) => {
 
             <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-xl shadow-lg">
                 
+                {/* Mensaje de Error (Reemplazo de alert()) */}
+                {validationError && (
+                    <div className="p-3 bg-red-100 text-red-700 rounded-lg font-medium text-sm border border-red-300">
+                        {validationError}
+                    </div>
+                )}
+
                 {/* Campo Nombre Completo */}
                 <div>
                     <label htmlFor="fullName" className={labelClasses}>Nombre Completo *</label>
@@ -220,7 +234,7 @@ const CourseDetail = ({ course, onBack, onEnrollClick, myCoursesList }) => {
                 </div>
             </section>
             
-             <section className="bg-white p-4 rounded-xl shadow-md">
+              <section className="bg-white p-4 rounded-xl shadow-md">
                 <h2 className="text-xl font-bold text-[#17202A] mb-3">Temas Principales</h2>
                 <ul className="list-disc list-inside space-y-1 text-gray-600 ml-2">
                     {course.topics.map((topic, index) => (
@@ -272,12 +286,13 @@ const CoursesScreen = ({ showNotification }) => {
         price: undefined 
     };
     
+    // Filtramos el curso del catálogo y lo añadimos a mis cursos
     setCatalogData(prev => prev.filter(c => c.id !== course.id));
     setMyCoursesData(prev => [...prev, newMyCourse]);
     
     // 🚨 CAMBIO 2: Llamar a showNotification
     if (showNotification) {
-      showNotification(¡Felicidades! Te has inscrito en: ${course.title});
+      showNotification(`¡Felicidades! Te has inscrito en: ${course.title}`);
     }
     
     setSelectedCourse(null);
@@ -330,10 +345,10 @@ const CoursesScreen = ({ showNotification }) => {
           <section className="space-y-4">
               {filteredCourses.map(course => (
                   <CourseCard 
-                    key={course.id} 
-                    course={course} 
-                    onClick={setSelectedCourse} 
-                    isMyCourse={activeView !== 'catalog'}
+                      key={course.id} 
+                      course={course} 
+                      onClick={setSelectedCourse} 
+                      isMyCourse={activeView !== 'catalog'}
                   />
               ))}
           </section>
@@ -348,13 +363,15 @@ const CoursesScreen = ({ showNotification }) => {
         <div className="flex bg-gray-100 p-1 rounded-xl shadow-inner mb-4">
           <button
             onClick={() => { setActiveView('catalog'); setSearchTerm(''); }}
-            className={flex-1 py-2 text-center text-sm font-semibold rounded-lg transition ${activeView === 'catalog' ? 'bg-white shadow-md text-[#17202A]' : 'text-gray-600 hover:bg-gray-200'}}
+            // 🛑 CORRECCIÓN 3: Uso de backticks (`)
+            className={`flex-1 py-2 text-center text-sm font-semibold rounded-lg transition ${activeView === 'catalog' ? 'bg-white shadow-md text-[#17202A]' : 'text-gray-600 hover:bg-gray-200'}`}
           >
             Catálogo de Cursos
           </button>
           <button
             onClick={() => { setActiveView('myCourses'); setSearchTerm(''); }}
-            className={flex-1 py-2 text-center text-sm font-semibold rounded-lg transition ${activeView === 'myCourses' ? 'bg-white shadow-md text-[#17202A]' : 'text-gray-600 hover:bg-gray-200'}}
+            // 🛑 CORRECCIÓN 4: Uso de backticks (`)
+            className={`flex-1 py-2 text-center text-sm font-semibold rounded-lg transition ${activeView === 'myCourses' ? 'bg-white shadow-md text-[#17202A]' : 'text-gray-600 hover:bg-gray-200'}`}
           >
             Mis Cursos ({myCoursesData.length})
           </button>
