@@ -5,7 +5,7 @@ const AssistantChatModal = ({ isOpen, onClose, userName }) => {
   
   if (!isOpen) return null;
   
-  const initialMessage = `Hola, ${userName}. Soy Josué. ¿Tienes alguna consulta o duda? ¡Estoy aquí para ayudarte!😁`;
+  const initialMessage = `Hola, ${userName}. Soy Josue. ¿Tienes alguna consulta o duda? ¡Estoy aquí para ayudarte!😁`;
   
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
@@ -17,7 +17,7 @@ const AssistantChatModal = ({ isOpen, onClose, userName }) => {
         <header className="flex items-center justify-between p-4 bg-[#1ABC9C] text-white rounded-t-2xl">
           <div className="flex items-center">
             <Bot className="w-6 h-6 mr-2" />
-            <h2 className="text-xl font-bold">Josué, Asistente AI</h2>
+            <h2 className="text-xl font-bold">Josue, Asistente Workly</h2>
           </div>
           <button onClick={onClose} aria-label="Cerrar chat" className="hover:text-gray-200 transition">
             <X className="w-6 h-6" />
@@ -27,7 +27,7 @@ const AssistantChatModal = ({ isOpen, onClose, userName }) => {
         {/* Cuerpo del Chat (Mensajes) */}
         <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50">
           
-          {/* Mensaje de Bienvenida de Josué */}
+          {/* Mensaje de Bienvenida de Josue */}
           <div className="flex justify-start">
             <div className="max-w-[80%] bg-white p-3 rounded-t-xl rounded-br-xl shadow-md border-b-2 border-[#1ABC9C] text-gray-700">
               <p>{initialMessage}</p>
