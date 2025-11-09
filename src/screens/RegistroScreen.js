@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, LogIn, Eye, EyeOff, Loader2, ArrowLeft, User, UserPlus } from 'lucide-react'; 
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft, User, UserPlus } from 'lucide-react'; 
 
 // --- Componente de Botón Reutilizable ---
 const CustomPrimaryButton = ({ children, disabled, type, className = '' }) => (
