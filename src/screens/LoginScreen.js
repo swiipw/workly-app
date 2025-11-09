@@ -32,7 +32,6 @@ const LoginScreen = ({ onLogin, onNavigate }) => {
     };
 
     const handleRegister = () => {
-        // La clave: Llama a onNavigate('register') para cambiar la vista en App.js
         if (onNavigate) {
             onNavigate('register'); 
         }
@@ -64,9 +63,19 @@ const LoginScreen = ({ onLogin, onNavigate }) => {
             <div className="w-full max-w-sm bg-white p-8 pt-10 rounded-2xl shadow-xl border border-gray-100">
                 
                 <div className="flex flex-col items-center mb-10">
-                    <div className="w-16 h-16 bg-workly-secondary rounded-full flex items-center justify-center mb-4">
-                        <User className="w-8 h-8 text-white" />
-                    </div>
+                    {/* CAMBIO CLAVE AQUÍ: Reemplazamos el marcador de posición por el logo */}
+                    <img 
+                        src="/workly_logo.png" 
+                        alt="Workly Logo" 
+                        className="w-20 h-20 mb-4" 
+                        onError={(e) => {
+                            // Fallback si la imagen no se carga (útil para desarrollo)
+                            e.target.onerror = null; 
+                            e.target.src = "https://placehold.co/80x80/1ABC9C/ffffff?text=Logo"; 
+                        }}
+                    />
+                    {/* FIN DEL CAMBIO CLAVE */}
+                    
                     <h1 className="text-3xl font-extrabold text-[#17202A] mb-2">Workly</h1>
                     <p className="text-gray-500 text-center text-base font-medium">
                         Conectamos talento joven con oportunidades del futuro
@@ -106,7 +115,7 @@ const LoginScreen = ({ onLogin, onNavigate }) => {
                     
                     <div className="text-center text-sm mt-4 space-y-3">
                         <button type="button" onClick={handleForgotPassword} className="text-[#1ABC9C] hover:text-[#16A085] block transition font-medium focus:outline-none focus:ring-2 focus:ring-[#1ABC9C] focus:ring-offset-2">
-                            ¿Olvidaste tu contraseña?
+                                 ¿Olvidaste tu contraseña?
                         </button>
                         
                         <p className="text-gray-500">
