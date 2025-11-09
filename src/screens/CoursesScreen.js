@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } => 'react';
 import { Search, BookOpen, Clock, BarChart, CheckCircle, ArrowLeft, Layers, UserCheck } from 'lucide-react';
 
 // --- DATOS INICIALES (FUERA DEL COMPONENTE PRINCIPAL) ---
@@ -95,7 +95,8 @@ const EnrollmentForm = ({ course, onConfirm, onCancel }) => {
     const labelClasses = "block text-sm font-medium text-gray-700 mb-1 mt-3"; // Clase para la etiqueta
 
     return (
-        <div className="p-4 space-y-6">
+        // 🚨 AÑADIDO: Contenedor para limitar el ancho y centrar
+        <div className="p-4 space-y-6 max-w-2xl mx-auto">
             <h1 className="text-2xl font-extrabold text-[#17202A]">Inscripción a: {course.title}</h1>
             <p className="text-gray-600">Completa tus datos para confirmar tu inscripción. <span className="font-semibold text-[#F39C12]">{course.price}</span></p>
 
@@ -189,7 +190,8 @@ const CourseDetail = ({ course, onBack, onEnrollClick, myCoursesList }) => {
     const enrolledCourse = isEnrolled ? myCoursesList.find(mc => mc.id === course.id) : null;
 
     return (
-        <div className="p-4 space-y-6">
+        // 🚨 AÑADIDO: Contenedor para limitar el ancho y centrar
+        <div className="p-4 space-y-6 max-w-2xl mx-auto">
             
             {/* Botón de Regreso */}
             <button 
@@ -250,7 +252,6 @@ const CourseDetail = ({ course, onBack, onEnrollClick, myCoursesList }) => {
 }
 
 // Componente Principal de Cursos
-// 🚨 CAMBIO 1: Recibir showNotification como prop
 const CoursesScreen = ({ showNotification }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeView, setActiveView] = useState('catalog');
@@ -275,7 +276,6 @@ const CoursesScreen = ({ showNotification }) => {
     setCatalogData(prev => prev.filter(c => c.id !== course.id));
     setMyCoursesData(prev => [...prev, newMyCourse]);
     
-    // 🚨 CAMBIO 2: Llamar a showNotification
     if (showNotification) {
       showNotification(`¡Felicidades! Te has inscrito en: ${course.title}`);
     }
@@ -341,7 +341,8 @@ const CoursesScreen = ({ showNotification }) => {
   }
 
   return (
-    <div className="p-4 space-y-6">
+    // 🚨 CAMBIO PRINCIPAL: Añadir max-width (max-w-2xl) y centrar (mx-auto)
+    <div className="p-4 space-y-6 max-w-2xl mx-auto">
       
       {/* 1. BARRA DE PESTAÑAS (TABS) */}
       <div className="sticky top-0 bg-gray-50 pt-4 pb-3 z-10">
