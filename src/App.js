@@ -1,31 +1,47 @@
 import React, { useState } from 'react';
 import LoginScreen from './screens/LoginScreen';
-// --- LÍNEA CORREGIDA: Se añade la extensión .js para que Vercel lo encuentre ---
+// 1. IMPORTAR RegistroScreen
+import RegistroScreen from './screens/RegistroScreen';
 import MainAppScreen from './MainAppScreen.js'; 
-// -----------------------------------------------------------------------------
 import { AppProvider } from './context/AppContext'; 
 
 function AppContent() {
-  const [user, setUser] = useState(null);
+  // Eliminamos el estado 'user' y lo reemplazamos por el estado 'view'
+  const [user, setUser] = useState(null); // Mantenemos 'user' para el estado de autenticación
+  // 2. NUEVO ESTADO: Controla la vista actual ('login', 'register', 'home')
+  const [currentView, setCurrentView] = useState('login'); 
 
-  if (user) {
+  // FUNCIÓN CENTRAL DE NAVEGACIÓN: Se pasa como prop 'onNavigate'
+  const navigateTo = (viewName) => {
+    setCurrentView(viewName);
+    // Aseguramos que si navegamos a login o register, el usuario se desloguee.
+    if (viewName !== 'home') {
+        setUser(null); 
+    }
+  };
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setCurrentView('home'); // Navegar a 'home' después del login exitoso
+  };
+
+  // --- LÓGICA DE RENDERIZADO CONDICIONAL ---
+  if (user && currentView === 'home') {
+    // Caso 1: Usuario autenticado y en la vista principal
     return (
-      <MainAppScreen user={user} onLogout={() => setUser(null)} />
+      <MainAppScreen user={user} onLogout={() => { setUser(null); setCurrentView('login'); }} />
     );
-  } else {
+  } 
+  
+  if (currentView === 'register') {
+    // Caso 2: Mostrar la pantalla de Registro
     return (
-      <LoginScreen onLogin={(userData) => setUser(userData)} />
+      <RegistroScreen 
+        onNavigate={navigateTo} // Permite volver al login o ir a otra vista
+        onRegistrationSuccess={handleLogin} // Opcional: para loguear inmediatamente después de registrar
+      />
     );
   }
-}
-
-export default function App() {
-    return (
-        <AppProvider>
-            <AppContent />
-        </AppProvider>
-    );
-}
 
 // --- Configuración de Tailwind (Necesaria para los estilos) ---
 window.tailwind.config = {
@@ -51,3 +67,22 @@ window.tailwind.config = {
     },
   },
 };
+
+  // Caso 3: Vista por defecto (Login)
+  return (
+    <LoginScreen 
+      onLogin={handleLogin} // Maneja el login y cambia la vista a 'home'
+      onNavigate={navigateTo} // ¡Esta es la clave para ir a 'register'!
+    />
+  );
+}
+
+export default function App() {
+    return (
+        <AppProvider>
+            <AppContent />
+        </AppProvider>
+    );
+}
+
+// ... (Resto de la configuración de Tailwind)
