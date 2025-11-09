@@ -156,7 +156,8 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
     const labelClasses = "block text-sm font-medium text-gray-700 mb-1 mt-3";
 
     return (
-        <div className="p-4 space-y-6">
+        // CORRECCIÓN APLICADA AQUÍ: pb-28 (padding-bottom grande) para dejar espacio libre para el navbar inferior.
+        <div className="p-4 space-y-6 pb-28"> 
             <button 
                 onClick={onCancel} 
                 className="flex items-center text-[#17202A] hover:text-red-600 font-semibold transition"
@@ -245,13 +246,15 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
                 </div>
                 
                 {/* Botón de Enviar Postulación */}
-                <button 
-                    type="submit"
-                    className="w-full py-3 bg-[#1ABC9C] text-white font-bold text-lg rounded-xl shadow-lg hover:bg-[#17202A] transition mt-6 flex items-center justify-center"
-                >
-                    <Send className="w-5 h-5 mr-2" />
-                    Enviar Postulación
-                </button>
+                <div className="pt-6"> 
+                    <button 
+                        type="submit"
+                        className="w-full py-3 bg-[#1ABC9C] text-white font-bold text-lg rounded-xl shadow-lg hover:bg-[#17202A] transition flex items-center justify-center"
+                    >
+                        <Send className="w-5 h-5 mr-2" />
+                        Enviar Postulación
+                    </button>
+                </div>
             </form>
         </div>
     );
@@ -275,8 +278,10 @@ const JobsScreen = ({ showNotification }) => {
         // Simulación: No guardamos en base de datos, solo notificamos
         console.log(`Aplicación exitosa para: ${job.title}`);
         
-        if (showNotification) {
+        if (typeof showNotification === 'function') {
             showNotification(`¡Postulación exitosa a ${job.title}! Recibirás un correo de confirmación.`);
+        } else {
+            console.log("Notificación: ¡Postulación exitosa! (showNotification no definida)");
         }
         
         // Vuelve a la vista de lista de empleos
@@ -308,7 +313,8 @@ const JobsScreen = ({ showNotification }) => {
     
     // Vista de Lista (Default)
     return (
-        <div className="p-4 space-y-6">
+        // Se añade un padding-bottom más pequeño para la vista de lista, si también tiene navbar fijo.
+        <div className="p-4 space-y-6 pb-20"> 
             
             {/* 1. BARRA DE BÚSQUEDA */}
             <div className="sticky top-0 bg-gray-50 pt-4 pb-3 z-10">
