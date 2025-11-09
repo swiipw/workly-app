@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Briefcase, MapPin, DollarSign, Clock, ArrowLeft, Send, FileText, User, Mail } from 'lucide-react';
+import { Search, Briefcase, MapPin, DollarSign, Clock, ArrowLeft, Send, FileText } from 'lucide-react';
 
 // --- DATOS DE EMPLEO COMPLETOS ---
 const jobData = [
