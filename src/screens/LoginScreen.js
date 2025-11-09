@@ -77,7 +77,7 @@ const LoginScreen = ({ onLogin, onNavigate }) => {
                         alt="Workly Logo" 
                         className="w-32 h-auto mb-4" 
                     />
-                    <h1 className="text-3xl font-extrabold text-[#17202A] mb-2">Bienvenido a Workly</h1>
+                    <h1 className="text-3xl font-extrabold text-[#17202A] mb-2">Workly</h1>
                     <p className="text-gray-500 text-center text-base font-medium">
                         Conectamos talento joven con oportunidades del futuro
                     </p> 
