@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Briefcase, MapPin, DollarSign, Clock, ArrowLeft, Send, FileText } from 'lucide-react';
+import { Search, Briefcase, MapPin, DollarSign, Clock, ArrowLeft, Send, FileText, ClipboardList } from 'lucide-react';
 
 // --- DATOS DE EMPLEO COMPLETOS ---
-const jobData = [
+const initialJobData = [
     { 
         id: 1, 
         title: "Diseñador UX/UI Senior", 
@@ -18,6 +18,7 @@ const jobData = [
         title: "Desarrollador Frontend (React)", 
         company: "Workly Labs", 
         location: "Lima, PE", 
+        // FIX: Se corrigió el error de sintaxis en el string de salary.
         salary: "$55k - $65k / año", 
         type: "Full-Time",
         description: "Únete a nuestro equipo de desarrollo para crear interfaces rápidas y responsivas usando React y TypeScript. Necesitamos a alguien apasionado por la calidad del código y la optimización del rendimiento web. Experiencia con Next.js o Vite es un plus.",
@@ -43,13 +44,37 @@ const jobData = [
     },
 ];
 
+// Simulamos una postulación ya enviada para tener algo en "Mis Postulaciones"
+const initialMyApplicationsData = [
+    { 
+        id: 6, 
+        title: "Scrum Master", 
+        company: "Agile Solutions", 
+        location: "Remoto", 
+        salary: "$60k - $75k / año", 
+        type: "Full-Time",
+        status: "En Revisión", // Nuevo campo de estado
+        date: "2025-10-01",
+        description: "Postulación enviada para liderar el equipo de desarrollo, asegurando la adopción y el cumplimiento de las prácticas de Scrum. Foco en la eliminación de impedimentos y la mejora continua.",
+        requirements: ["Certificación Scrum Master (CSM/PSM).", "3+ años de experiencia como SM.", "Excelentes habilidades de coaching y comunicación."],
+    }
+];
+
 // Componente Tarjeta de Empleo (clickable)
-const JobCard = ({ job, onClick }) => (
+const JobCard = ({ job, onClick, isApplication = false }) => (
     <div 
         className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300 border-l-4 border-[#1ABC9C] cursor-pointer"
         onClick={() => onClick(job)}
     >
-        <h3 className="text-xl font-bold text-[#17202A] mb-1">{job.title}</h3>
+        <div className="flex justify-between items-start">
+            <h3 className="text-xl font-bold text-[#17202A] mb-1">{job.title}</h3>
+            {isApplication && (
+                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${job.status === 'En Revisión' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
+                    {job.status}
+                </span>
+            )}
+        </div>
+        
         <p className="text-gray-600 mb-3">{job.company}</p>
         <div className="flex flex-wrap text-sm text-gray-500 space-x-4">
             <span className="flex items-center"><MapPin className="w-4 h-4 mr-1 text-[#F39C12]" /> {job.location}</span>
@@ -60,14 +85,14 @@ const JobCard = ({ job, onClick }) => (
 );
 
 // Componente de Detalle de Empleo
-const JobDetail = ({ job, onBack, onApplyClick }) => (
+const JobDetail = ({ job, onBack, onApplyClick, isApplication = false }) => (
     <div className="p-4 space-y-6">
         <button 
             onClick={onBack} 
             className="flex items-center text-[#17202A] hover:text-[#1ABC9C] font-semibold mb-6 transition"
         >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Volver a la Búsqueda
+            {isApplication ? 'Volver a Mis Postulaciones' : 'Volver a la Búsqueda'}
         </button>
 
         <header className="bg-white p-6 rounded-xl shadow-lg">
@@ -78,39 +103,55 @@ const JobDetail = ({ job, onBack, onApplyClick }) => (
                 <span className="flex items-center"><DollarSign className="w-5 h-5 mr-1 text-[#1ABC9C]" /> {job.salary}</span>
                 <span className="flex items-center"><Clock className="w-5 h-5 mr-1" /> {job.type}</span>
             </div>
+            {isApplication && (
+                <div className="mt-4 flex items-center justify-between text-lg font-medium">
+                    <p className="text-gray-700">Estado de Postulación:</p>
+                    <span className={`font-bold px-3 py-1 rounded-full ${job.status === 'En Revisión' ? 'text-yellow-700 bg-yellow-100' : 'text-green-700 bg-green-100'}`}>
+                        {job.status}
+                    </span>
+                </div>
+            )}
         </header>
 
         <section className="space-y-6">
             <div className="bg-white p-4 rounded-xl shadow-md">
                 <h2 className="text-xl font-bold text-[#17202A] mb-3">Descripción del Puesto</h2>
-                <p className="text-gray-700 leading-relaxed">{job.description}</p>
+                {/* Usamos un valor por defecto si job.description es nulo/indefinido */}
+                <p className="text-gray-700 leading-relaxed">{job.description || "Descripción no disponible."}</p>
             </div>
 
             <div className="bg-white p-4 rounded-xl shadow-md">
                 <h2 className="text-xl font-bold text-[#17202A] mb-3">Requisitos Clave</h2>
                 <ul className="list-disc list-inside space-y-1 text-gray-600 ml-4">
-                    {job.requirements.map((req, index) => (
+                    {/* Usamos encadenamiento opcional (?) para evitar llamar .map() si job.requirements es undefined o null */}
+                    {job.requirements?.map((req, index) => (
                         <li key={index}>{req}</li>
                     ))}
+                    {/* Mostramos un mensaje si no hay requisitos definidos */}
+                    {(!job.requirements || job.requirements.length === 0) && (
+                         <li className="text-gray-500 italic">No hay requisitos listados para esta posición.</li>
+                    )}
                 </ul>
             </div>
         </section>
 
-        {/* Botón de Postular */}
-        <div className="py-4">
-            <button
-                onClick={onApplyClick}
-                className="w-full py-4 bg-[#F39C12] text-white font-bold text-xl rounded-xl shadow-lg hover:bg-[#E67E22] transition flex items-center justify-center"
-            >
-                <Send className="w-6 h-6 mr-3" />
-                Postular Ahora
-            </button>
-        </div>
+        {/* Botón de Postular (solo visible si no está postulado) */}
+        {!isApplication && (
+            <div className="py-4">
+                <button
+                    onClick={onApplyClick}
+                    className="w-full py-4 bg-[#F39C12] text-white font-bold text-xl rounded-xl shadow-lg hover:bg-[#E67E22] transition flex items-center justify-center"
+                >
+                    <Send className="w-6 h-6 mr-3" />
+                    Postular Ahora
+                </button>
+            </div>
+        )}
     </div>
 );
 
 
-// Componente Formulario de Postulación
+// Componente Formulario de Postulación (sin cambios en la corrección de padding)
 const ApplicationForm = ({ job, onConfirm, onCancel }) => {
     const [formData, setFormData] = useState({
         fullName: '',
@@ -124,7 +165,6 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
         const { name, value, files } = e.target;
         
         if (name === 'cvFile') {
-            // Manejar la selección de archivos
             setFormData(prev => ({ ...prev, cvFile: files[0] }));
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
@@ -135,13 +175,12 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Validación obligatoria
+        // Usamos un mensaje de error en la UI en lugar de alert()
         if (!formData.fullName || !formData.email || !formData.cvFile) {
             setValidationError("Por favor, rellena tu nombre, correo y sube tu CV.");
             return;
         }
 
-        // Simulación de envío de datos
         console.log("Datos de Postulación Enviados:", {
             ...formData,
             jobTitle: job.title,
@@ -156,7 +195,7 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
     const labelClasses = "block text-sm font-medium text-gray-700 mb-1 mt-3";
 
     return (
-        // CORRECCIÓN APLICADA AQUÍ: pb-28 (padding-bottom grande) para dejar espacio libre para el navbar inferior.
+        // Se mantiene la CORRECCIÓN DE PADDING: pb-28 para el espacio del navbar
         <div className="p-4 space-y-6 pb-28"> 
             <button 
                 onClick={onCancel} 
@@ -178,7 +217,7 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
                     </div>
                 )}
 
-                {/* Campo Nombre Completo */}
+                {/* Campos de formulario */}
                 <div>
                     <label htmlFor="fullName" className={labelClasses}>Nombre Completo *</label>
                     <input 
@@ -193,7 +232,6 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
                     />
                 </div>
                 
-                {/* Campo Correo Electrónico */}
                 <div>
                     <label htmlFor="email" className={labelClasses}>Correo Electrónico *</label>
                     <input 
@@ -208,7 +246,6 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
                     />
                 </div>
                 
-                {/* Campo Teléfono (Opcional) */}
                 <div>
                     <label htmlFor="phone" className={labelClasses}>Teléfono (Opcional)</label>
                     <input 
@@ -263,11 +300,19 @@ const ApplicationForm = ({ job, onConfirm, onCancel }) => {
 
 const JobsScreen = ({ showNotification }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedJob, setSelectedJob] = useState(null); // Estado para la vista de detalle
-    const [isApplying, setIsApplying] = useState(false); // Estado para el formulario de postulación
+    const [activeView, setActiveView] = useState('catalog'); // Nuevo estado para la vista activa
+    const [selectedJob, setSelectedJob] = useState(null); 
+    const [isApplying, setIsApplying] = useState(false); 
+    
+    // Estados para simular los datos de la app
+    const [jobData, setJobData] = useState(initialJobData);
+    const [myApplicationsData, setMyApplicationsData] = useState(initialMyApplicationsData);
+    
+    // Define el conjunto de datos actual basado en la vista activa
+    const currentData = activeView === 'catalog' ? jobData : myApplicationsData;
     
     // Lógica de filtrado
-    const filteredJobs = jobData.filter(job =>
+    const filteredJobs = currentData.filter(job =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.company.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -275,19 +320,53 @@ const JobsScreen = ({ showNotification }) => {
     // Función que se llama al confirmar el formulario
     const handleApplicationConfirm = (job) => {
         
-        // Simulación: No guardamos en base de datos, solo notificamos
-        console.log(`Aplicación exitosa para: ${job.title}`);
+        // 1. Crear el objeto de postulación con el estado inicial
+        const newApplication = { 
+            ...job, 
+            status: "En Revisión", 
+            date: new Date().toISOString().slice(0, 10) 
+        };
         
+        // 2. Mover el trabajo del catálogo a mis postulaciones (simulación)
+        setJobData(prev => prev.filter(j => j.id !== job.id));
+        setMyApplicationsData(prev => [...prev, newApplication]);
+        
+        // 3. Notificación y limpieza de estado
         if (typeof showNotification === 'function') {
             showNotification(`¡Postulación exitosa a ${job.title}! Recibirás un correo de confirmación.`);
         } else {
             console.log("Notificación: ¡Postulación exitosa! (showNotification no definida)");
         }
         
-        // Vuelve a la vista de lista de empleos
+        // 4. Volver a la vista de lista y cambiar a "Mis Postulaciones"
         setSelectedJob(null);
         setIsApplying(false);
+        setActiveView('myApplications');
     };
+    
+    // Función para renderizar la lista de empleos/postulaciones
+    const renderJobList = () => {
+        if (filteredJobs.length === 0) {
+            return (
+                <p className="text-gray-500 text-center p-6 bg-white rounded-xl shadow-inner">
+                    {activeView === 'catalog' ? 'No se encontraron empleos que coincidan con la búsqueda.' : 'Aún no has enviado ninguna postulación.'}
+                </p>
+            );
+        }
+        
+        return (
+            <section className="space-y-4">
+                {filteredJobs.map(job => (
+                    <JobCard 
+                        key={job.id} 
+                        job={job} 
+                        onClick={setSelectedJob} 
+                        isApplication={activeView !== 'catalog'} // Pasa si es postulación
+                    />
+                ))}
+            </section>
+        );
+    }
 
     // LÓGICA DE RENDERIZADO PRINCIPAL
     
@@ -307,22 +386,39 @@ const JobsScreen = ({ showNotification }) => {
                 job={selectedJob}
                 onBack={() => setSelectedJob(null)}
                 onApplyClick={() => setIsApplying(true)}
+                isApplication={activeView !== 'catalog'} // Pasa si es postulación
             />
         );
     }
     
     // Vista de Lista (Default)
     return (
-        // Se añade un padding-bottom más pequeño para la vista de lista, si también tiene navbar fijo.
+        // Se añade un padding-bottom para el espacio del navbar fijo
         <div className="p-4 space-y-6 pb-20"> 
             
-            {/* 1. BARRA DE BÚSQUEDA */}
+            {/* 1. BARRA DE PESTAÑAS (TABS) */}
             <div className="sticky top-0 bg-gray-50 pt-4 pb-3 z-10">
+                <div className="flex bg-gray-100 p-1 rounded-xl shadow-inner mb-4">
+                    <button
+                        onClick={() => { setActiveView('catalog'); setSearchTerm(''); }}
+                        className={`flex-1 py-2 text-center text-sm font-semibold rounded-lg transition ${activeView === 'catalog' ? 'bg-white shadow-md text-[#17202A]' : 'text-gray-600 hover:bg-gray-200'}`}
+                    >
+                        Catálogo de Empleos
+                    </button>
+                    <button
+                        onClick={() => { setActiveView('myApplications'); setSearchTerm(''); }}
+                        className={`flex-1 py-2 text-center text-sm font-semibold rounded-lg transition ${activeView === 'myApplications' ? 'bg-white shadow-md text-[#17202A]' : 'text-gray-600 hover:bg-gray-200'}`}
+                    >
+                        Mis Postulaciones ({myApplicationsData.length})
+                    </button>
+                </div>
+                
+                {/* 2. BARRA DE BÚSQUEDA */}
                 <div className="relative shadow-md rounded-xl">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input 
                         type="text" 
-                        placeholder="Buscar empleos por título o empresa..."
+                        placeholder={activeView === 'catalog' ? "Buscar en el catálogo..." : "Buscar en tus postulaciones..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#F39C12] focus:border-transparent transition"
@@ -330,23 +426,16 @@ const JobsScreen = ({ showNotification }) => {
                 </div>
             </div>
             
-            {/* 2. RESULTADOS DE LA BÚSQUEDA */}
+            {/* 3. RESULTADOS DE LA VISTA ACTIVA */}
             <h2 className="text-xl font-bold text-[#17202A] mb-4 flex items-center">
-                <Briefcase className="w-6 h-6 mr-2 text-[#1ABC9C]" />
-                Resultados ({filteredJobs.length})
+                {activeView === 'catalog' ? 
+                    <Briefcase className="w-6 h-6 mr-2 text-[#1ABC9C]" /> : 
+                    <ClipboardList className="w-6 h-6 mr-2 text-[#F39C12]" />
+                }
+                {activeView === 'catalog' ? 'Empleos Disponibles' : 'Postulaciones Enviadas'} ({filteredJobs.length})
             </h2>
             
-            <section className="space-y-4">
-                {filteredJobs.length > 0 ? (
-                    filteredJobs.map(job => (
-                        <JobCard key={job.id} job={job} onClick={setSelectedJob} />
-                    ))
-                ) : (
-                    <p className="text-gray-500 text-center p-6 bg-white rounded-xl shadow-inner">
-                        No se encontraron empleos que coincidan con "{searchTerm}".
-                    </p>
-                )}
-            </section>
+            {renderJobList()}
             
         </div>
     );
