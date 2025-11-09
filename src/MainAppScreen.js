@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import BottomNavBar from './components/BottomNavBar';
 import WorklyLogo from './components/WorklyLogo';
 import FloatingAssistantButton from './components/FloatingAssistantButton'; 
-import AssistantChatModal from './components/AssistantChatModal'; // <- NUEVA IMPORTACIÓN
+import AssistantChatModal from './components/AssistantChatModal'; 
 import HomeScreen from './screens/HomeScreen';
 import JobsScreen from './screens/JobsScreen';
 import CoursesScreen from './screens/CoursesScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import ChatScreen from './screens/ChatScreen'; // <- IMPORTACIÓN CORRECTA
 
 const MainAppScreen = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('home');
-  // Nuevo estado para controlar si el modal de chat está visible
   const [isChatOpen, setIsChatOpen] = useState(false); 
     
-  // Función que se ejecuta al presionar el botón de Josué
   const handleAssistantClick = () => {
     setIsChatOpen(true);
   };
@@ -26,6 +25,8 @@ const MainAppScreen = ({ user, onLogout }) => {
         return (<JobsScreen />); 
       case 'courses':
         return (<CoursesScreen />); 
+      case 'chat': // <- CASO DE CHAT CORRECTO
+        return (<ChatScreen />);
       case 'profile':
         return (<ProfileScreen user={user} onLogout={onLogout} />); 
       default:
@@ -45,10 +46,8 @@ const MainAppScreen = ({ user, onLogout }) => {
 
       <BottomNavBar activeTab={activeTab} onTabChange={setActiveTab} />
       
-      {/* EL ASISTENTE FLOTANTE que ahora solo abre el chat */}
       <FloatingAssistantButton onAssistantClick={handleAssistantClick} />
       
-      {/* MODAL DEL CHAT - visible si isChatOpen es true */}
       <AssistantChatModal 
         isOpen={isChatOpen} 
         onClose={() => setIsChatOpen(false)} 
