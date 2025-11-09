@@ -1,65 +1,7 @@
-import React from 'react';
-import { Send, X, Bot } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, X, Bot, HelpCircle } from 'lucide-react';
 
-const AssistantChatModal = ({ isOpen, onClose, userName }) => {
-  
-  if (!isOpen) return null;
-  
-  const initialMessage = `Hola, ${userName}. Soy Josue. ¿Tienes alguna consulta o duda? ¡Estoy aquí para ayudarte!😁`;
-  
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
-      
-      {/* Contenedor del Modal con tamaño limitado */}
-      <div className="w-full max-w-sm h-3/4 bg-white rounded-t-2xl shadow-2xl flex flex-col pointer-events-auto">
-        
-        {/* Encabezado del Chat */}
-        <header className="flex items-center justify-between p-4 bg-[#1ABC9C] text-white rounded-t-2xl">
-          <div className="flex items-center">
-            <Bot className="w-6 h-6 mr-2" />
-            <h2 className="text-xl font-bold">Josue, Asistente Workly</h2>
-          </div>
-          <button onClick={onClose} aria-label="Cerrar chat" className="hover:text-gray-200 transition">
-            <X className="w-6 h-6" />
-          </button>
-        </header>
-
-        {/* Cuerpo del Chat (Mensajes) */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50">
-          
-          {/* Mensaje de Bienvenida de Josue */}
-          <div className="flex justify-start">
-            <div className="max-w-[80%] bg-white p-3 rounded-t-xl rounded-br-xl shadow-md border-b-2 border-[#1ABC9C] text-gray-700">
-              <p>{initialMessage}</p>
-            </div>
-          </div>
-          
-          {/* Placeholder de Respuesta del Usuario */}
-          <div className="flex justify-end">
-            <div className="max-w-[80%] bg-[#1ABC9C] text-white p-3 rounded-t-xl rounded-bl-xl shadow-md">
-              <p>¿Qué empleos hay para diseñadores UX en remoto?</p>
-            </div>
-          </div>
-          
-        </div>
-
-        {/* Barra de Entrada de Texto */}
-        <footer className="p-3 border-t bg-white">
-          <div className="flex items-center space-x-2">
-            <input 
-              type="text" 
-              placeholder="Escribe tu mensaje..." 
-              className="flex-1 p-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#1ABC9C] focus:border-transparent" 
-            />
-            <button 
-              className="p-3 bg-[#1ABC9C] text-white rounded-full hover:bg-[#17202A] transition"
-              aria-label="Enviar mensaje"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </div>
-        </footer>
-        // --- CONFIGURACIÓN DE RESPUESTAS AUTOMÁTICAS ---
+// --- CONFIGURACIÓN DE RESPUESTAS AUTOMÁTICAS ---
 const initialOptions = [
     { 
         id: 'cv_management', 
@@ -74,35 +16,44 @@ const initialOptions = [
     { 
         id: 'other_contact', 
         question: "Tengo otra pregunta / Necesito contactar a alguien.", 
-        // ¡MENSAJE MODIFICADO AQUÍ!
         answer: "Entendido. No te preocupes. Estoy enviando un aviso a nuestro equipo. **Josué se comunicará contigo en breve** para ayudarte personalmente con tu consulta. Por favor, mantente atento a tu correo o notificaciones. ¡Gracias! 🤝" 
     },
 ];
 
 // --- COMPONENTE MENSAJE ---
 const ChatMessage = ({ message, isUser }) => {
+    // Clases de Tailwind CSS para la burbuja de chat
     const bubbleClass = isUser 
-        ? "bg-[#1ABC9C] text-white rounded-t-xl rounded-bl-xl"
-        : "bg-white shadow-md border-b-2 border-[#1ABC9C] text-gray-700";
-    
+        ? "bg-[#1ABC9C] text-white rounded-t-xl rounded-bl-xl" // Verde Workly
+        : "bg-white shadow-md border-b-2 border-[#1ABC9C] text-gray-700"; // Fondo blanco con borde verde
+
     const alignClass = isUser ? "justify-end" : "justify-start";
     
     return (
         <div className={`flex ${alignClass}`}>
             <div className={`max-w-[85%] ${bubbleClass} p-3 rounded-xl whitespace-pre-wrap`}>
-                <p className="text-sm">{message}</p>
+                <p className="text-sm font-[Inter]">{message}</p>
             </div>
         </div>
     );
 };
 
-// --- COMPONENTE MODAL DE CHAT ---
-const AssistantChatModal = ({ isOpen, onClose, userName = "Usuario" }) => {
+// --- COMPONENTE MODAL DE CHAT (AssistantChatModal) ---
+// Exportado por defecto
+const AssistantChatModal = ({ isOpen: propIsOpen, onClose: propOnClose, userName = "Usuario" }) => {
     const [messages, setMessages] = useState([]);
     const [optionsVisible, setOptionsVisible] = useState(true); 
     const messagesEndRef = useRef(null);
     const initialMessage = `Hola, ${userName}. Soy Josué, tu asistente de Workly. ¿Tienes alguna de estas consultas sobre cómo usar la app?`;
     
+    // Estado interno para manejar la visibilidad en el modo de demostración (si no hay props)
+    const [internalOpen, setInternalOpen] = useState(propIsOpen ?? false);
+
+    // Determinar el estado y el controlador (priorizando props externos)
+    const isOpen = propIsOpen !== undefined ? propIsOpen : internalOpen;
+    const handleClose = propOnClose || (() => setInternalOpen(false));
+    const handleOpen = () => setInternalOpen(true);
+
     // Inicializar el mensaje de Josué
     useEffect(() => {
         if (isOpen && messages.length === 0) {
@@ -110,69 +61,90 @@ const AssistantChatModal = ({ isOpen, onClose, userName = "Usuario" }) => {
         }
     }, [isOpen, initialMessage, messages.length]);
 
-    // Scroll automático al final
+    // Scroll automático al final de los mensajes
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    // Manejar el clic en una opción
+    // Manejar el clic en una opción predefinida
     const handleOptionClick = (option) => {
         // 1. Añadir pregunta del usuario
         setMessages(prev => [...prev, { type: 'user', text: option.question }]);
         
-        // 2. Añadir respuesta automática de Josué
+        // 2. Añadir respuesta automática de Josué después de un breve retraso
         setTimeout(() => {
             setMessages(prev => [...prev, { type: 'bot', text: option.answer }]);
             
-            // Si elige contactar, oculta las opciones
+            // Si elige contactar, oculta las opciones para forzar el uso del input de texto
             if (option.id === 'other_contact') {
                 setOptionsVisible(false);
             } else {
-                // Si elige una pregunta estándar, deja las opciones visibles para que pueda hacer otra
+                // Si es una pregunta estándar, las opciones permanecen visibles para otra consulta
                 setOptionsVisible(true); 
             }
         }, 500); 
     };
 
-    // Placeholder para el envío de texto libre
+    // Manejar el envío de texto libre
     const handleFreeTextSend = (e) => {
         e.preventDefault();
         const input = e.target.elements.messageInput.value.trim();
         if (!input) return;
 
+        // 1. Añadir el mensaje del usuario
         setMessages(prev => [...prev, { type: 'user', text: input }]);
         e.target.elements.messageInput.value = '';
 
         // Ocultar opciones al escribir texto libre
         setOptionsVisible(false);
 
-        // Respuesta genérica para texto libre 
+        // 2. Respuesta genérica de Josué para texto libre
         setTimeout(() => {
             setMessages(prev => [...prev, { 
                 type: 'bot', 
-                text: "Gracias por tu pregunta. Para una respuesta automática, por favor usa las opciones predefinidas. Si necesitas contacto humano, selecciona la opción 'Tengo otra pregunta / Necesito contactar a alguien'."
+                text: "Gracias por tu pregunta. Mis respuestas automáticas se limitan a las opciones predefinidas. Si necesitas contacto humano, por favor selecciona la opción 'Tengo otra pregunta / Necesito contactar a alguien'."
             }]);
         }, 800);
     };
 
-
+    // Si la modal está cerrada Y no está controlada por el prop externo, renderizar el botón de apertura
+    if (!isOpen && propIsOpen === undefined) {
+        return (
+            <div className="min-h-screen bg-gray-100 p-4 flex flex-col items-center justify-center font-[Inter]">
+                <div className="p-6 bg-white rounded-xl shadow-lg w-full max-w-lg text-center">
+                    <p className="text-gray-600 mb-4">
+                        Haz clic en el botón de ayuda para iniciar el chat con Josué.
+                    </p>
+                    <button
+                        onClick={handleOpen}
+                        className="flex items-center justify-center px-6 py-3 bg-[#F39C12] text-white font-semibold rounded-full shadow-md hover:bg-[#E67E22] transition transform hover:scale-105"
+                    >
+                        <HelpCircle className="w-5 h-5 mr-2" />
+                        Abrir Asistente Josué
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    
+    // Si el prop isOpen es false, retorna null (si está controlado externamente)
     if (!isOpen) return null;
     
-    // Verifica si el último mensaje fue del bot y si las opciones deben estar visibles
+    // Determinar si el último mensaje fue del bot (para mostrar opciones)
     const isBotLastMessage = messages.length > 0 && messages[messages.length - 1].type === 'bot';
     
     return (
-        <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none p-4 sm:p-0">
-            {/* Contenedor del Chat con tamaño limitado */}
+        <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none p-4 sm:p-0 font-[Inter] backdrop-blur-sm">
+            {/* Contenedor del Chat con tamaño limitado y responsive */}
             <div className="w-full max-w-sm h-full sm:h-3/4 bg-white rounded-t-2xl shadow-2xl flex flex-col pointer-events-auto">
                 
                 {/* Encabezado del Chat */}
                 <header className="flex items-center justify-between p-4 bg-[#1ABC9C] text-white rounded-t-2xl">
                     <div className="flex items-center">
                         <Bot className="w-6 h-6 mr-2" />
-                        <h2 className="text-xl font-bold">Josué, Asistente de Workly</h2>
+                        <h2 className="text-lg font-bold">Josué, Asistente de Workly</h2>
                     </div>
-                    <button onClick={onClose} aria-label="Cerrar chat" className="hover:text-gray-200 transition p-1 rounded-full hover:bg-[#17202A] focus:outline-none focus:ring-2 focus:ring-white">
+                    <button onClick={handleClose} aria-label="Cerrar chat" className="hover:text-gray-200 transition p-1 rounded-full hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-white">
                         <X className="w-6 h-6" />
                     </button>
                 </header>
@@ -190,15 +162,15 @@ const AssistantChatModal = ({ isOpen, onClose, userName = "Usuario" }) => {
                     {/* Botones de Opciones: Muestra si el último mensaje es del bot Y si las opciones están visibles */}
                     {isBotLastMessage && optionsVisible && (
                         <div className="flex justify-start pt-2 flex-col space-y-2">
-                            {initialOptions.map((option, index) => (
+                            {initialOptions.map((option) => (
                                 <button
                                     key={option.id}
                                     onClick={() => handleOptionClick(option)}
-                                    // Cambia el estilo del botón 'Otros'
+                                    // Estilo condicional: resalta la opción de contacto
                                     className={`text-left max-w-[85%] p-3 rounded-lg hover:bg-opacity-80 transition shadow-sm border text-sm font-medium 
                                         ${option.id === 'other_contact' 
-                                            ? 'bg-red-100 text-red-800 border-red-300 hover:bg-red-200' 
-                                            : 'bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200'
+                                            ? 'bg-red-100 text-red-800 border-red-300 hover:bg-red-200' // Opción de contacto/soporte
+                                            : 'bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200' // Opciones estándar
                                         }`}
                                 >
                                     {option.question}
@@ -232,42 +204,6 @@ const AssistantChatModal = ({ isOpen, onClose, userName = "Usuario" }) => {
             </div>
         </div>
     );
-};
-
-// --- COMPONENTE DE APLICACIÓN PRINCIPAL (Para mostrar el modal) ---
-const App = () => {
-    const [isChatOpen, setIsChatOpen] = useState(true); // Abrir por defecto para el preview
-
-    return (
-        <div className="min-h-screen bg-gray-100 p-4 flex flex-col items-center justify-center font-[Inter]">
-            {/* ELIMINADO: <script src="https://cdn.tailwindcss.com"></script> */}
-
-            <h1 className="text-3xl font-bold text-[#1ABC9C] mb-8">
-                Panel de Control de Workly
-            </h1>
-
-            <div className="p-6 bg-white rounded-xl shadow-lg w-full max-w-lg text-center">
-                <p className="text-gray-600 mb-4">
-                    Haz clic en el botón de ayuda para iniciar el chat con Josué.
-                </p>
-                <button
-                    onClick={() => setIsChatOpen(true)}
-                    className="flex items-center justify-center px-6 py-3 bg-[#F39C12] text-white font-semibold rounded-full shadow-md hover:bg-[#E67E22] transition transform hover:scale-105"
-                >
-                    <HelpCircle className="w-5 h-5 mr-2" />
-                    Abrir Asistente Josué
-                </button>
-            </div>
-            
-            {/* El Modal Asistente Josué */}
-            <AssistantChatModal 
-                isOpen={isChatOpen} 
-                onClose={() => setIsChatOpen(false)} 
-                userName="Andrés" 
-            />
-  </div>
-    </div>
-  );
 };
 
 export default AssistantChatModal;
