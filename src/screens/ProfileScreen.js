@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Briefcase, Phone, LogOut, ChevronRight, Loader2, BookOpen, Heart, Code, Edit } from 'lucide-react';
+import { LogOut, ChevronRight, Loader2, BookOpen, Heart, Code, Edit } from 'lucide-react';
 
 // Componente auxiliar para las filas de información (Simula ser editable)
 const EditableRow = ({ icon: Icon, label, value }) => {
