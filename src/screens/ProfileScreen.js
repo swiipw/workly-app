@@ -4,25 +4,73 @@ import {
     BookOpen, LogOut, Save, X, Plus, Check, Zap, ArrowLeft, Calendar, FileText, Upload 
 } from 'lucide-react'; 
 
+// --- DATOS INICIALES (MANTENIDOS AL INICIO) ---
+
+// Certificados iniciales simulados
+const INITIAL_CERTIFICATES = [
+    { 
+        id: 1, 
+        name: "Introducción a React", 
+        issuer: "CodeAcademy", 
+        date: "2024-05-15", 
+        imageUrl: "https://placehold.co/120x80/2980B9/ffffff?text=React+Cert" 
+    },
+];
+
+// Datos de aprendizaje simulados por mes
+const LEARNING_DATA = [
+    { Mes: 'Jul', Horas: 18 },
+    { Mes: 'Ago', Horas: 25 },
+    { Mes: 'Sep', Horas: 35 },
+    { Mes: 'Oct', Horas: 42 },
+    { Mes: 'Nov', Horas: 20 },
+];
+
+// Datos iniciales del usuario
+const INITIAL_USER_DATA = {
+    name: "Andrea Sofía Castro", 
+    email: "andrea.castro@example.com",
+    age: 24, 
+    preferences: ['Programación Web', 'Marketing Digital', 'Diseño UX/UI'],
+    skills: ['JavaScript', 'React', 'Tailwind CSS'],
+    certificates: INITIAL_CERTIFICATES, 
+    profileImageUrl: "https://i.pravatar.cc/150?img=33" // URL de imagen inicial
+};
+
+// Datos simulados para la demostración del perfil
+const SIMULATED_DATA = {
+    career: {
+        performanceRating: 4.5,
+        totalHours: LEARNING_DATA.reduce((sum, item) => sum + item.Horas, 0),
+        learningData: LEARNING_DATA
+    }
+};
+
+const INITIAL_PREFERENCES = [
+    'Programación Web', 'Marketing Digital', 'Diseño UX/UI', 'Inteligencia Artificial',
+    'Análisis de Datos', 'Gestión de Proyectos', 'Ciberseguridad', 'Cloud Computing',
+    'Ventas y Negocios', 'Redes Sociales'
+];
+
+const INITIAL_SKILLS = [
+    'JavaScript', 'React', 'Tailwind CSS', 'Python', 'SQL', 'Figma', 
+    'Photoshop', 'Google Analytics', 'SEO', 'Scrum', 'Liderazgo', 'Comunicación'
+];
+
+
 // --- SIMULACIÓN DE RECHARTS (Componentes de Gráfica) ---
-// Se ha refactorizado para garantizar que el componente Bar reciba los datos explícitamente.
 const Recharts = {
-    // Componente contenedor simulado
     ResponsiveContainer: ({ children, width = '100%', height = 300 }) => (
         <div style={{ width, height, position: 'relative' }}>{children}</div>
     ),
-    // El BarChart solo actúa como contenedor SVG
     BarChart: ({ children }) => <svg viewBox="0 0 500 300" className="w-full h-full">{children}</svg>,
-
-    // Componente Bar: Ahora debe recibir los datos directamente como prop 'data'
     Bar: ({ dataKey, fill, data }) => {
-        // CORRECCIÓN: Comprobación defensiva para evitar el error 'map'
         if (!data || data.length === 0) return null; 
 
         const maxData = Math.max(...data.map(d => d.Horas), 0);
         if (maxData === 0) return null;
 
-        const scaleY = (value) => (value / maxData) * 200; // Escala a 200px de alto máximo
+        const scaleY = (value) => (value / maxData) * 200; 
 
         return data.map((d, index) => {
             const barHeight = scaleY(d.Horas);
@@ -32,9 +80,7 @@ const Recharts = {
 
             return (
                 <g key={index}>
-                    {/* Barra */}
                     <rect x={x} y={y} width={barWidth} height={barHeight} fill={fill} rx="4" ry="4" />
-                    {/* Etiqueta de texto (Horas) */}
                     <text x={x + barWidth / 2} y={y - 5} fill="#333" textAnchor="middle" fontSize="12">
                         {d.Horas}h
                     </text>
@@ -42,7 +88,6 @@ const Recharts = {
             );
         });
     },
-    // Eje X: Ahora también recibe los datos para dibujar las etiquetas
     XAxis: ({ dataKey, data }) => (
         <g transform="translate(0, 300)">
             <line x1="50" y1="0" x2="450" y2="0" stroke="#ccc" />
@@ -66,74 +111,14 @@ const Recharts = {
 const { ResponsiveContainer, BarChart, Bar, XAxis, YAxis } = Recharts;
 // --- FIN DE SIMULACIÓN DE RECHARTS ---
 
-// --- DATOS INICIALES ---
-
-// Certificados iniciales simulados
-const INITIAL_CERTIFICATES = [
-    { 
-        id: 1, 
-        name: "Introducción a React", 
-        issuer: "CodeAcademy", 
-        date: "2024-05-15", 
-        imageUrl: "https://placehold.co/120x80/2980B9/ffffff?text=React+Cert" 
-    },
-];
-
-// Datos de aprendizaje simulados por mes
-const LEARNING_DATA = [
-    { Mes: 'Jul', Horas: 18 },
-    { Mes: 'Ago', Horas: 25 },
-    { Mes: 'Sep', Horas: 35 },
-    { Mes: 'Oct', Horas: 42 },
-    { Mes: 'Nov', Horas: 20 },
-];
-
-// Datos iniciales del usuario (Ahora incluye profileImageUrl)
-const INITIAL_USER_DATA = {
-    name: "Andrea Sofía Castro", 
-    email: "andrea.castro@example.com",
-    age: 24, 
-    preferences: ['Programación Web', 'Marketing Digital', 'Diseño UX/UI'],
-    skills: ['JavaScript', 'React', 'Tailwind CSS'],
-    certificates: INITIAL_CERTIFICATES, 
-    profileImageUrl: "https://i.pravatar.cc/150?img=33" // URL de imagen inicial
-};
-
-// Datos simulados para la demostración del perfil
-const simulatedData = {
-    career: {
-        performanceRating: 4.5,
-        totalHours: LEARNING_DATA.reduce((sum, item) => sum + item.Horas, 0),
-        learningData: LEARNING_DATA
-    }
-};
-
-const INITIAL_PREFERENCES = [
-    'Programación Web', 'Marketing Digital', 'Diseño UX/UI', 'Inteligencia Artificial',
-    'Análisis de Datos', 'Gestión de Proyectos', 'Ciberseguridad', 'Cloud Computing',
-    'Ventas y Negocios', 'Redes Sociales'
-];
-
-const INITIAL_SKILLS = [
-    'JavaScript', 'React', 'Tailwind CSS', 'Python', 'SQL', 'Figma', 
-    'Photoshop', 'Google Analytics', 'SEO', 'Scrum', 'Liderazgo', 'Comunicación'
-];
-
 // --- COMPONENTES AUXILIARES ---
 
-// CORRECCIÓN DEL COMPONENTE STAR RATING
+// Componente StarRating
 const StarRating = ({ rating }) => {
-    // 1. Estrellas completas
     const fullStars = Math.floor(rating);
-    
-    // 2. ¿Hay media estrella? (Si el decimal está entre 0.25 y 0.75, se cuenta como media)
     const decimalPart = rating % 1;
     const hasHalfStar = decimalPart >= 0.25 && decimalPart < 0.75;
-    
-    // 3. Estrellas que ya hemos contado (llenas + media, si existe)
     const starsAccountedFor = fullStars + (hasHalfStar ? 1 : 0);
-    
-    // 4. Estrellas vacías restantes (5 - estrellas contadas)
     const emptyStars = 5 - starsAccountedFor;
 
     return (
@@ -143,9 +128,7 @@ const StarRating = ({ rating }) => {
             ))}
             {hasHalfStar && (
                 <div key="half" className="relative w-5 h-5 overflow-hidden">
-                    {/* Estrella completa con el color de relleno */}
                     <Star className="absolute w-5 h-5 fill-current" />
-                    {/* Media máscara blanca para simular la media estrella vacía */}
                     <div className="absolute w-1/2 h-full bg-white right-0"></div> 
                 </div>
             )}
@@ -164,7 +147,6 @@ const generateUsername = (name) => {
 
 // --- PANTALLAS ---
 
-// Pantalla de Horas de Aprendizaje
 const LearningHoursScreen = ({ data, onBack, totalHours }) => {
     return (
         <div className="bg-white p-6 rounded-xl shadow-2xl border-t-8 border-green-500/80 mb-6">
@@ -184,12 +166,9 @@ const LearningHoursScreen = ({ data, onBack, totalHours }) => {
                 <p className="text-sm text-gray-500 mt-2">Progreso de los últimos 5 meses</p>
             </div>
 
-
-            {/* Contenedor de la Gráfica */}
             <div className="bg-gray-50 p-4 rounded-lg shadow-inner h-[350px]">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart> {/* BarChart ya no lleva data aquí en la simulación */}
-                        {/* Se pasa 'data' explícitamente a XAxis y Bar */}
+                    <BarChart>
                         <XAxis dataKey="Mes" data={data} />
                         <YAxis />
                         <Bar data={data} dataKey="Horas" fill="#16A085" />
@@ -204,8 +183,6 @@ const LearningHoursScreen = ({ data, onBack, totalHours }) => {
     );
 };
 
-
-// Pantalla de Certificados (sin cambios)
 const CertificatesScreen = ({ certificates, onBack, onAddCertificate }) => {
     const [newCertName, setNewCertName] = useState('');
     const [newCertIssuer, setNewCertIssuer] = useState('');
@@ -221,7 +198,6 @@ const CertificatesScreen = ({ certificates, onBack, onAddCertificate }) => {
         e.preventDefault();
         
         if (!newCertName || !newCertIssuer || !newCertDate || !certificateFile) {
-            // Reemplazamos alert() por un console.error o modal en un entorno real.
             console.error("Por favor, completa todos los campos y sube el certificado.");
             return;
         }
@@ -378,8 +354,6 @@ const CertificatesScreen = ({ certificates, onBack, onAddCertificate }) => {
     );
 };
 
-
-// Formulario de edición (sin cambios relevantes)
 const EditProfileForm = ({ user, initialPreferences, initialSkills, onSave, onCancel }) => {
     const [name, setName] = useState(user.name);
     const [age, setAge] = useState(user.age);
@@ -429,7 +403,6 @@ const EditProfileForm = ({ user, initialPreferences, initialSkills, onSave, onCa
         }
         setNewPrefInput('');
     };
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -638,9 +611,10 @@ const EditProfileForm = ({ user, initialPreferences, initialSkills, onSave, onCa
 };
 
 
-// Componente de la Pantalla de Perfil (Modo Visualización)
-const ProfileScreen = ({ initialUserData, initialSimulatedData }) => {
-    const [user, setUser] = useState(initialUserData);
+// Componente principal de la Pantalla de Perfil
+const ProfileScreen = () => {
+    // Definimos el estado inicial usando los datos estáticos definidos arriba
+    const [user, setUser] = useState(INITIAL_USER_DATA);
     const [view, setView] = useState('profile');
 
     const handleLogout = () => {
@@ -669,13 +643,9 @@ const ProfileScreen = ({ initialUserData, initialSimulatedData }) => {
         }));
     };
 
-    // NUEVO MANEJADOR DE FOTO DE PERFIL
     const handleProfileImageChange = (file) => {
         if (file) {
-            // Crea una URL temporal para la previsualización inmediata en el navegador.
             const newImageUrl = URL.createObjectURL(file);
-            
-            // Actualiza el estado del usuario con la nueva URL de la imagen.
             setUser(prevUser => ({
                 ...prevUser,
                 profileImageUrl: newImageUrl,
@@ -717,23 +687,19 @@ const ProfileScreen = ({ initialUserData, initialSimulatedData }) => {
                     
                     <div className="relative mb-4">
                         <img 
-                            // Usa la URL del estado, que puede ser la URL temporal de la carga
                             src={user.profileImageUrl}
                             alt="Foto de Perfil"
                             className="w-32 h-32 object-cover rounded-full border-4 border-gray-100 shadow-lg"
                         />
                         
-                        {/* INPUT OCULTO para seleccionar archivo */}
                         <input
                             type="file"
                             id="profile-image-upload"
                             className="hidden"
                             accept="image/*"
-                            // Llama al manejador cuando se selecciona un archivo
                             onChange={(e) => handleProfileImageChange(e.target.files[0])} 
                         />
 
-                        {/* ETIQUETA/BOTÓN visible que activa el input oculto */}
                         <label
                             htmlFor="profile-image-upload"
                             className="absolute bottom-0 right-0 p-2 bg-[#F39C12] text-white rounded-full hover:bg-[#E67E22] transition shadow-lg ring-4 ring-white cursor-pointer"
@@ -827,12 +793,12 @@ const ProfileScreen = ({ initialUserData, initialSimulatedData }) => {
                             className="flex justify-between items-center p-3 bg-green-50/50 rounded-lg border-l-4 border-green-500 cursor-pointer hover:bg-green-100 transition shadow-sm"
                         >
                             <p className="flex items-center text-gray-700 font-semibold"><Clock className="w-5 h-5 mr-3 text-green-500" /> Horas de Aprendizaje:</p>
-                            <span className="font-extrabold text-xl text-green-700">{initialSimulatedData.career.totalHours}h</span>
+                            <span className="font-extrabold text-xl text-green-700">{SIMULATED_DATA.career.totalHours}h</span>
                         </div>
                         
                         <div className="border-t pt-4">
                             <p className="text-gray-700 font-semibold mb-2 flex items-center"><Star className="w-5 h-5 mr-2 text-[#F39C12]" /> Rendimiento (Promedio de Estrellas):</p>
-                            <StarRating rating={initialSimulatedData.career.performanceRating} />
+                            <StarRating rating={SIMULATED_DATA.career.performanceRating} />
                         </div>
                     </div>
                 </section>
@@ -877,8 +843,8 @@ const ProfileScreen = ({ initialUserData, initialSimulatedData }) => {
                         />
                     ) : view === 'learning' ? (
                         <LearningHoursScreen
-                            data={initialSimulatedData.career.learningData}
-                            totalHours={initialSimulatedData.career.totalHours}
+                            data={SIMULATED_DATA.career.learningData}
+                            totalHours={SIMULATED_DATA.career.totalHours}
                             onBack={() => setView('profile')}
                         />
                     ) : (
@@ -890,12 +856,5 @@ const ProfileScreen = ({ initialUserData, initialSimulatedData }) => {
     );
 };
 
-// Componente Wrapper para manejar datos iniciales
-const AppWrapper = () => (
-    <ProfileScreen 
-        initialUserData={INITIAL_USER_DATA}
-        initialSimulatedData={simulatedData}
-    />
-);
-
+// Se realiza la exportación directa de ProfileScreen, eliminando el wrapper.
 export default ProfileScreen;
