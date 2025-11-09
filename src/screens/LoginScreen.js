@@ -63,15 +63,19 @@ const LoginScreen = ({ onLogin, onNavigate }) => {
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100 font-sans">
             <div className="w-full max-w-sm bg-white p-8 pt-10 rounded-2xl shadow-xl border border-gray-100">
                 
-                <div className="flex flex-col items-center mb-10">
-                    <div className="w-16 h-16 bg-workly-secondary rounded-full flex items-center justify-center mb-4">
-                        <User className="w-8 h-8 text-white" />
-                    </div>
-                    <h1 className="text-3xl font-extrabold text-[#17202A] mb-2">Workly</h1>
-                    <p className="text-gray-500 text-center text-base font-medium">
-                        Conectamos talento joven con oportunidades del futuro
-                    </p> 
-                </div>
+                {/* LOGO OFICIAL Y ESLOGAN */}
+        <div className="flex flex-col items-center mb-10">
+          <img 
+            src="/workly_logo.png" // RUTA DEL LOGO EN PUBLIC/
+            alt="Workly Logo" 
+            className="w-32 h-auto mb-4" 
+          />
+          <h1 className="text-3xl font-extrabold text-[#17202A] mb-2">Workly</h1>
+          {/* ESLOGAN CON TAMAÑO CORREGIDO (text-base) */}
+          <p className="text-gray-500 text-center text-base font-medium">Conectamos talento joven con oportunidades del futuro</p> 
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-6">
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     
