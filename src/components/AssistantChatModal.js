@@ -68,6 +68,9 @@ const AssistantChatModal = ({ isOpen: propIsOpen, onClose: propOnClose, userName
 
     // Manejar el clic en una opción predefinida
     const handleOptionClick = (option) => {
+        // Ocultar las opciones mientras se procesa la respuesta (para evitar doble clic)
+        setOptionsVisible(false);
+
         // 1. Añadir pregunta del usuario
         setMessages(prev => [...prev, { type: 'user', text: option.question }]);
         
@@ -75,13 +78,13 @@ const AssistantChatModal = ({ isOpen: propIsOpen, onClose: propOnClose, userName
         setTimeout(() => {
             setMessages(prev => [...prev, { type: 'bot', text: option.answer }]);
             
-            // Si elige contactar, oculta las opciones para forzar el uso del input de texto
-            if (option.id === 'other_contact') {
-                setOptionsVisible(false);
-            } else {
-                // Si es una pregunta estándar, las opciones permanecen visibles para otra consulta
-                setOptionsVisible(true); 
-            }
+            // Lógica de visibilidad post-respuesta:
+            // Si elige contactar (other_contact), las opciones permanecen ocultas (false) 
+            // para fomentar el contacto o el uso del input libre.
+            // Para cualquier otra opción, las opciones vuelven a ser visibles (true).
+            const shouldShowOptions = option.id !== 'other_contact';
+            setOptionsVisible(shouldShowOptions); 
+
         }, 500); 
     };
 
@@ -95,15 +98,17 @@ const AssistantChatModal = ({ isOpen: propIsOpen, onClose: propOnClose, userName
         setMessages(prev => [...prev, { type: 'user', text: input }]);
         e.target.elements.messageInput.value = '';
 
-        // Ocultar opciones al escribir texto libre
+        // Ocultar opciones al escribir texto libre, ya que Josué no puede responder preguntas abiertas
         setOptionsVisible(false);
 
         // 2. Respuesta genérica de Josué para texto libre
         setTimeout(() => {
             setMessages(prev => [...prev, { 
                 type: 'bot', 
-                text: "Gracias por tu pregunta. Mis respuestas automáticas se limitan a las opciones predefinidas. Si necesitas contacto humano, por favor selecciona la opción 'Tengo otra pregunta / Necesito contactar a alguien'."
+                text: "Gracias por tu pregunta. Mis respuestas automáticas se limitan a las opciones predefinidas. Por favor, selecciona una de ellas. Si requieres atención personalizada, usa la opción 'Tengo otra pregunta / Necesito contactar a alguien'."
             }]);
+            // Después de la respuesta genérica, mostrar las opciones nuevamente
+            setOptionsVisible(true); 
         }, 800);
     };
 
