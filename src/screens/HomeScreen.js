@@ -5,18 +5,28 @@ import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/fir
 import { Briefcase, BookOpen, Clock, Zap, LogOut, User, ArrowLeft, GraduationCap, Clock3, Database, Send, Aperture, UserRoundCheck } from 'lucide-react';
 
 // --- Configuración de Entorno y Firebase (OBLIGATORIO) ---
+// Estas variables son provistas por el entorno de Canvas y son necesarias para la ejecución.
+// Se inicializan aquí, fuera del componente, para ser usadas en la configuración de Firebase.
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-// Inicialización de Firebase
+// Inicialización de Firebase (fuera de los componentes para que se ejecute una sola vez)
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
 // --- COMPONENTES AUXILIARES ---
 
-// Componente para una tarjeta de estadística
+/**
+ * Componente para una tarjeta de estadística.
+ * @param {object} props - Propiedades del componente.
+ * @param {React.ComponentType} props.icon - Icono de Lucide React.
+ * @param {string} props.title - Título de la estadística.
+ * @param {string} props.value - Valor de la estadística.
+ * @param {string} props.color - Clases de Tailwind para el color de fondo.
+ * @param {function} props.onClick - Función de callback al hacer clic.
+ */
 const StatCard = ({ icon: Icon, title, value, color, onClick }) => (
     <div 
         className={`flex flex-col items-center justify-center p-4 rounded-xl shadow-md ${color} text-white transition duration-300 hover:scale-[1.03] transform cursor-pointer`}
@@ -28,40 +38,78 @@ const StatCard = ({ icon: Icon, title, value, color, onClick }) => (
     </div>
 );
 
-// Componente para una recomendación rápida (QuickLink)
+/**
+ * Componente para una recomendación rápida (QuickLink).
+ * @param {object} props - Propiedades del componente.
+ * @param {React.ComponentType} props.icon - Icono de Lucide React.
+ * @param {string} props.title - Título del enlace rápido.
+ * @param {string} props.color - Clases de Tailwind para el color del borde.
+ * @param {function} props.onClick - Función de callback al hacer clic.
+ */
 const QuickLink = ({ icon: Icon, title, color, onClick }) => (
     <div 
         className={`flex flex-col items-center p-3 rounded-xl border ${color} bg-white shadow-sm hover:shadow-lg transition cursor-pointer hover:border-2`}
-        onClick={onClick} // Agregamos el manejador de click
+        onClick={onClick} 
     >
         <Icon className="w-6 h-6 mb-1 text-gray-800" />
         <p className="text-sm font-medium text-center text-gray-700">{title}</p>
     </div>
 );
 
-// Componente de botón de volver para las sub-pantallas
-const BackButton = ({ onBack, title }) => (
-    <div className='flex justify-between items-center pt-2 pb-4 border-b-4 border-[#1ABC9C] bg-white rounded-xl shadow-lg p-6'>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-[#17202A] flex items-center">
-            {title === 'Mis Cursos' && <GraduationCap className='w-8 h-8 mr-3 text-[#1ABC9C]'/>}
-            {title === 'Mis Postulaciones y Empleos' && <Briefcase className='w-8 h-8 mr-3 text-[#F39C12]'/>}
-            {title === 'Mi Progreso de Aprendizaje' && <Database className='w-8 h-8 mr-3 text-blue-500'/>}
-            {title.includes('Aridna Rosales') && <UserRoundCheck className='w-8 h-8 mr-3 text-purple-600'/>}
-            {title}
-        </h2>
-        <button 
-            onClick={onBack}
-            className='flex items-center text-gray-600 font-semibold hover:bg-gray-100 p-2 rounded-lg transition border border-gray-300'
-        >
-            <ArrowLeft className='w-4 h-4 mr-1' />
-            Volver al Dashboard
-        </button>
-    </div>
-);
+/**
+ * Componente de botón de volver para las sub-pantallas.
+ * @param {object} props - Propiedades del componente.
+ * @param {function} props.onBack - Función para volver al dashboard.
+ * @param {string} props.title - Título de la pantalla actual.
+ */
+const BackButton = ({ onBack, title }) => {
+    let IconComponent;
+    let iconColor;
+
+    switch (title) {
+        case 'Mis Cursos':
+            IconComponent = GraduationCap;
+            iconColor = 'text-[#1ABC9C]';
+            break;
+        case 'Mis Postulaciones y Empleos':
+            IconComponent = Briefcase;
+            iconColor = 'text-[#F39C12]';
+            break;
+        case 'Mi Progreso de Aprendizaje':
+            IconComponent = Database;
+            iconColor = 'text-blue-500';
+            break;
+        case 'Asesora de Carreras AI: Aridna Rosales':
+            IconComponent = UserRoundCheck;
+            iconColor = 'text-purple-600';
+            break;
+        default:
+            IconComponent = ArrowLeft;
+            iconColor = 'text-gray-500';
+    }
+
+    return (
+        <div className='flex flex-wrap justify-between items-center pt-2 pb-4 border-b-4 border-[#1ABC9C] bg-white rounded-xl shadow-lg p-6'>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#17202A] flex items-center mb-4 sm:mb-0">
+                <IconComponent className={`w-8 h-8 mr-3 ${iconColor}`}/>
+                {title}
+            </h2>
+            <button 
+                onClick={onBack}
+                className='flex items-center text-gray-600 font-semibold hover:bg-gray-100 p-3 rounded-xl transition border border-gray-300 shadow-sm'
+            >
+                <ArrowLeft className='w-4 h-4 mr-1' />
+                Volver al Dashboard
+            </button>
+        </div>
+    );
+};
 
 // --- VISTAS ESPECÍFICAS ---
 
-// 1. VISTA DE CURSOS
+/**
+ * 1. VISTA DE CURSOS
+ */
 const CoursesScreen = ({ onBack }) => {
     const enrolledCourses = [
         { title: "Diseño UX/UI Avanzado", progress: 75, instructor: "Laura Smith", color: "bg-blue-600" },
@@ -70,18 +118,19 @@ const CoursesScreen = ({ onBack }) => {
     ];
 
     const CourseCard = ({ title, progress, instructor, color }) => (
-        <div className="bg-white p-5 rounded-xl shadow-md transition hover:shadow-lg transform hover:scale-[1.01] border-l-8 border-r-2" style={{ borderColor: color.replace('bg-', '') }}>
+        <div className="bg-white p-5 rounded-xl shadow-md transition hover:shadow-lg transform hover:scale-[1.01] border-l-8" 
+             style={{ borderColor: color.replace('bg-', '#') + 'AA' }}> 
             <div className="flex justify-between items-start mb-2">
                 <h4 className="text-xl font-bold text-gray-800">{title}</h4>
-                <div className={`${color} text-white text-xs font-semibold px-3 py-1 rounded-full`}>
+                <div className={`text-white text-xs font-semibold px-3 py-1 rounded-full`} style={{ backgroundColor: color.replace('bg-', '#') }}>
                     {progress}%
                 </div>
             </div>
             <p className="text-sm text-gray-500 mb-3">Instructor: {instructor}</p>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div 
-                    className={`${color} h-2.5 rounded-full transition-all duration-500`} 
-                    style={{ width: `${progress}%` }}
+                    className={`h-2.5 rounded-full transition-all duration-500`} 
+                    style={{ width: `${progress}%`, backgroundColor: color.replace('bg-', '#') }}
                 ></div>
             </div>
             <p className="text-xs text-gray-600 mt-2">
@@ -95,15 +144,19 @@ const CoursesScreen = ({ onBack }) => {
             <BackButton onBack={onBack} title="Mis Cursos" />
             <section className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-blue-500 pl-2">Inscripciones Activas ({enrolledCourses.length})</h3>
-                {enrolledCourses.map((course, index) => (
-                    <CourseCard key={index} {...course} />
-                ))}
+                <div className="grid md:grid-cols-2 gap-4">
+                    {enrolledCourses.map((course, index) => (
+                        <CourseCard key={index} {...course} />
+                    ))}
+                </div>
             </section>
         </div>
     );
 };
 
-// 2. VISTA DE EMPLEOS Y POSTULACIONES
+/**
+ * 2. VISTA DE EMPLEOS Y POSTULACIONES
+ */
 const JobsScreen = ({ onBack }) => {
     
     // Empleos Guardados (Saved Jobs)
@@ -120,7 +173,7 @@ const JobsScreen = ({ onBack }) => {
     ];
 
     const JobPostCard = ({ title, company, status, color, icon: Icon, date }) => (
-        <div className="bg-white p-4 rounded-xl shadow-md transition hover:shadow-lg flex items-center justify-between border-l-4 border-gray-200">
+        <div className="bg-white p-4 rounded-xl shadow-md transition hover:shadow-lg flex items-center justify-between border-l-4 border-gray-200 hover:border-blue-300">
             <div className='flex items-center'>
                 <Icon className={`w-6 h-6 mr-3 ${color}`} />
                 <div>
@@ -142,23 +195,29 @@ const JobsScreen = ({ onBack }) => {
             {/* Empleos Guardados */}
             <section className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-[#F39C12] pl-2">Empleos Guardados ({savedJobs.length})</h3>
-                {savedJobs.map((job, index) => (
-                    <JobPostCard key={index} {...job} />
-                ))}
+                <div className="grid gap-3">
+                    {savedJobs.map((job, index) => (
+                        <JobPostCard key={index} {...job} />
+                    ))}
+                </div>
             </section>
 
             {/* Aplicaciones Enviadas */}
             <section className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-red-500 pl-2">Aplicaciones Enviadas ({submittedApplications.length})</h3>
-                {submittedApplications.map((app, index) => (
-                    <JobPostCard key={index} {...app} />
-                ))}
+                <div className="grid gap-3">
+                    {submittedApplications.map((app, index) => (
+                        <JobPostCard key={index} {...app} />
+                    ))}
+                </div>
             </section>
         </div>
     );
 };
 
-// 3. VISTA DE HORAS DE APRENDIZAJE
+/**
+ * 3. VISTA DE HORAS DE APRENDIZAJE
+ */
 const LearningHoursScreen = ({ onBack }) => {
     
     // Datos de ejemplo para el progreso semanal
@@ -180,8 +239,8 @@ const LearningHoursScreen = ({ onBack }) => {
             {weeklyData.map((item, index) => (
                 <div key={index} className="flex flex-col items-center h-full justify-end w-1/8 mx-1">
                     <div 
-                        className="w-full rounded-t-lg bg-blue-500 transition-all duration-700 hover:bg-blue-600 shadow-md" 
-                        style={{ height: `${(item.hours / maxHours) * 100}%` }}
+                        className="w-full rounded-t-lg bg-blue-500 transition-all duration-700 hover:bg-blue-600 shadow-md transform hover:scale-y-105" 
+                        style={{ height: `${(item.hours / maxHours) * 100}%`, minHeight: item.hours > 0 ? '5px' : '0' }}
                         title={`${item.hours} horas`}
                     ></div>
                     <span className="text-xs text-gray-600 mt-2">{item.day}</span>
@@ -199,7 +258,7 @@ const LearningHoursScreen = ({ onBack }) => {
                     <Clock3 className="w-6 h-6 mr-2 text-blue-500" />
                     Resumen Semanal de Estudio
                 </h3>
-                <div className='flex justify-between items-center mb-6'>
+                <div className='flex flex-wrap justify-between items-center mb-6'>
                     <p className='text-4xl font-extrabold text-[#17202A]'>{totalHours}h</p>
                     <span className='text-lg font-medium text-gray-600'>Total esta semana</span>
                 </div>
@@ -214,13 +273,14 @@ const LearningHoursScreen = ({ onBack }) => {
     );
 };
 
-// 4. VISTA DE CHAT CON ASESORA (Personalizada para Aridna Rosales)
+/**
+ * 4. VISTA DE CHAT CON ASESORA (Personalizada para Aridna Rosales)
+ */
 const ChatScreen = ({ onBack }) => {
     // Placeholder de estado para el chat
     const [messages, setMessages] = useState([
         { 
             id: 1, 
-            // Mensaje de bienvenida personalizado
             text: "¡Hola! Soy Aridna Rosales, tu Asesora de Carrera AI en Workly. Estoy aquí para ayudarte a planificar tu desarrollo y conseguir tu próximo empleo. ¿En qué puedo asistirte?", 
             sender: 'ai' 
         }
@@ -231,20 +291,22 @@ const ChatScreen = ({ onBack }) => {
     const handleSend = () => {
         if (input.trim() === '') return;
         
-        const newMessage = {
+        const userMessage = {
             id: messages.length + 1,
-            text: input,
+            text: input.trim(),
             sender: 'user'
         };
         
-        setMessages(prev => [...prev, newMessage]);
+        // Agregar mensaje del usuario y limpiar input
+        setMessages(prev => [...prev, userMessage]);
+        const currentInput = input.trim();
         setInput('');
 
         // Respuesta simple de la IA después de un breve retraso
         setTimeout(() => {
             const aiResponse = {
                 id: messages.length + 2,
-                text: `Gracias por compartir tu consulta. Como Aridna Rosales, te sugiero que para la próxima vez que necesites ayuda con "${input}", intentes...`,
+                text: `Gracias por compartir tu consulta. Como Aridna Rosales, te sugiero que para la próxima vez que necesites ayuda con: "${currentInput}", intentes concentrarte en tus objetivos de carrera. ¿Te ayudo a repasar tus metas trimestrales?`,
                 sender: 'ai'
             };
             setMessages(prev => [...prev, aiResponse]);
@@ -253,9 +315,9 @@ const ChatScreen = ({ onBack }) => {
 
     const MessageBubble = ({ text, sender }) => (
         <div className={`flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-xs md:max-w-md lg:max-w-lg p-3 rounded-xl shadow-md ${
+            <div className={`max-w-xs md:max-w-md lg:max-w-lg p-3 text-sm rounded-xl shadow-md ${
                 sender === 'user' 
-                ? 'bg-purple-500 text-white rounded-br-none' 
+                ? 'bg-purple-600 text-white rounded-br-none' 
                 : 'bg-white text-gray-800 rounded-tl-none border border-gray-200'
             }`}>
                 {text}
@@ -265,12 +327,12 @@ const ChatScreen = ({ onBack }) => {
 
     return (
         <div className="p-4 space-y-6 min-h-screen bg-gray-50 font-[Inter] flex flex-col">
-            {/* Título personalizado */}
+            
             <BackButton onBack={onBack} title="Asesora de Carreras AI: Aridna Rosales" />
             
-            <div className="flex-grow bg-white rounded-xl shadow-lg flex flex-col">
+            <div className="flex-grow bg-white rounded-xl shadow-lg flex flex-col overflow-hidden h-[70vh] max-h-[70vh]">
                 {/* Área de Mensajes */}
-                <div className="flex-grow p-4 space-y-4 overflow-y-auto h-96 custom-scrollbar">
+                <div className="flex-grow p-4 space-y-4 overflow-y-auto" id="chat-window">
                     {messages.map(msg => (
                         <MessageBubble key={msg.id} text={msg.text} sender={msg.sender} />
                     ))}
@@ -287,7 +349,7 @@ const ChatScreen = ({ onBack }) => {
                             onChange={(e) => setInput(e.target.value)}
                             onKeyPress={(e) => { if (e.key === 'Enter') handleSend(); }}
                             placeholder="Escribe tu consulta para Aridna Rosales..."
-                            className="flex-grow px-4 py-3 border border-gray-300 rounded-full focus:ring-purple-500 focus:border-purple-500 shadow-inner"
+                            className="flex-grow px-4 py-3 border border-gray-300 rounded-full focus:ring-purple-500 focus:border-purple-500 shadow-inner outline-none"
                         />
                         <button
                             onClick={handleSend}
@@ -303,8 +365,9 @@ const ChatScreen = ({ onBack }) => {
     );
 };
 
-
-// --- HOME SCREEN (Componente modificado) ---
+/**
+ * HOME SCREEN (Componente Dashboard)
+ */
 const HomeScreen = ({ user, onLogout, onNavigate }) => {
     const userName = user?.displayName || "Usuario";
     const firstUserName = userName.split(' ')[0];
@@ -368,11 +431,11 @@ const HomeScreen = ({ user, onLogout, onNavigate }) => {
             
             {/* ENCABEZADO Y SALUDO DINÁMICO */}
             <header className="pt-2 pb-4 border-b-4 border-[#1ABC9C] bg-white rounded-xl shadow-lg p-6">
-                <div className='flex justify-between items-start'>
+                <div className='flex flex-wrap justify-between items-start'>
                     <h2 className="text-3xl sm:text-4xl font-extrabold text-[#17202A]">¡Hola, {firstUserName}! 👋</h2>
                     <button 
                         onClick={onLogout}
-                        className='flex items-center text-red-600 font-semibold hover:bg-red-50 p-2 rounded-full transition'
+                        className='flex items-center text-red-600 font-semibold hover:bg-red-50 p-3 rounded-full transition mt-4 sm:mt-0'
                     >
                         <LogOut className='w-5 h-5 mr-1' />
                         Salir
@@ -426,7 +489,9 @@ const HomeScreen = ({ user, onLogout, onNavigate }) => {
 };
 
 
-// --- LOGIN SCREEN (sin cambios) ---
+/**
+ * LOGIN SCREEN 
+ */
 const LoginScreen = ({ onLogin, loading }) => {
     const [nameInput, setNameInput] = useState('');
 
@@ -454,7 +519,7 @@ const LoginScreen = ({ onLogin, loading }) => {
                         placeholder="Tu Nombre (Ej: Andrea Castro)"
                         maxLength={30}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-[#1ABC9C] focus:border-[#1ABC9C] text-lg shadow-sm transition duration-150 ease-in-out"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-[#1ABC9C] focus:border-[#1ABC9C] text-lg shadow-sm transition duration-150 ease-in-out outline-none"
                     />
                 </div>
                 <button
@@ -470,8 +535,11 @@ const LoginScreen = ({ onLogin, loading }) => {
 };
 
 
-// --- COMPONENTE PRINCIPAL (RUTEO Y ESTADO DE AUTH) ---
-const Dashboard = () => {
+/**
+ * COMPONENTE PRINCIPAL (App)
+ * Contiene el ruteo y el estado de autenticación.
+ */
+const App = () => {
     const [authReady, setAuthReady] = useState(false);
     const [user, setUser] = useState(null); 
     const [isLoading, setIsLoading] = useState(true);
@@ -489,24 +557,29 @@ const Dashboard = () => {
 
         const setupFirebase = async () => {
             try {
+                // 1. Iniciar sesión: Usa el token provisto o inicia anónimamente
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
                     await signInAnonymously(auth);
                 }
 
+                // 2. Escuchar cambios de autenticación
                 unsubscribe = onAuthStateChanged(auth, async (authUser) => {
                     if (authUser) {
                         const currentUserId = authUser.uid;
+                        // Ruta de datos privada del usuario
                         const userDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/profile/user_data`);
                         const userDocSnap = await getDoc(userDocRef);
 
+                        // 3. Cargar datos del usuario (displayName)
                         if (userDocSnap.exists() && userDocSnap.data().displayName) {
                             setUser({ 
                                 userId: currentUserId,
                                 displayName: userDocSnap.data().displayName 
                             });
                         } else {
+                            // Usuario autenticado pero sin nombre (debe pasar al LoginScreen)
                             setUser({ userId: currentUserId, displayName: null });
                         }
                     } else {
@@ -527,6 +600,7 @@ const Dashboard = () => {
         };
     }, []);
 
+    // Manejar el inicio de sesión y guardar el nombre en Firestore
     const handleLogin = async (name) => {
         if (!name.trim() || !user || !user.userId) return;
 
@@ -537,7 +611,7 @@ const Dashboard = () => {
             await setDoc(userDocRef, {
                 displayName: name.trim(),
                 createdAt: serverTimestamp(),
-            }, { merge: true });
+            }, { merge: true }); // Usar merge para no sobrescribir otros campos
 
             setUser(prev => ({ ...prev, displayName: name.trim() }));
             setIsLoading(false);
@@ -548,11 +622,13 @@ const Dashboard = () => {
         }
     };
 
+    // Manejar el cierre de sesión (borra solo el nombre para forzar el Login en la próxima carga)
     const handleLogout = async () => {
         if (!user || !user.userId) return;
 
         try {
             setIsLoading(true);
+            // Simular el cierre de sesión borrando el displayName, pero manteniendo la sesión de Firebase anónima.
             const userDocRef = doc(db, `artifacts/${appId}/users/${user.userId}/profile/user_data`);
             await setDoc(userDocRef, { displayName: null }, { merge: true }); 
             
@@ -582,7 +658,7 @@ const Dashboard = () => {
     // 2. Pantalla Principal (Manejo del Router/Switch de Vistas)
     if (user && user.displayName) {
         return (
-            <div className="min-h-screen bg-gray-100 font-[Inter]">
+            <div className="min-h-screen bg-gray-100 font-[Inter] pb-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Renderiza la vista actual */}
                     {currentView === 'home' && (
@@ -619,7 +695,7 @@ const Dashboard = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-red-100 p-4 font-[Inter]">
-            <p className="text-red-700">Ocurrió un error con la sesión. Por favor, recarga.</p>
+            <p className="text-red-700">Ocurrió un error inesperado. Por favor, recarga.</p>
         </div>
     );
 };
