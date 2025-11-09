@@ -124,7 +124,7 @@ const StarRating = ({ rating }) => {
     return (
         <div className="flex items-center text-[#F39C12]">
             {[...Array(fullStars)].map((_, i) => (
-                <Star key={`full-${i}`} className="w-5 h-5 fill-current" />
+                <Star key={full-${i}} className="w-5 h-5 fill-current" />
             ))}
             {hasHalfStar && (
                 <div key="half" className="relative w-5 h-5 overflow-hidden">
@@ -133,7 +133,7 @@ const StarRating = ({ rating }) => {
                 </div>
             )}
             {[...Array(emptyStars)].map((_, i) => (
-                <Star key={`empty-${i}`} className="w-5 h-5 text-gray-300" />
+                <Star key={empty-${i}} className="w-5 h-5 text-gray-300" />
             ))}
             <span className="text-sm text-gray-600 ml-2">({rating.toFixed(1)} / 5)</span>
         </div>
@@ -234,7 +234,7 @@ const CertificatesScreen = ({ certificates, onBack, onAddCertificate }) => {
                         <div key={cert.id} className="flex items-center bg-gray-50 p-3 rounded-lg shadow-sm hover:bg-gray-100 transition">
                             <img 
                                 src={cert.imageUrl} 
-                                alt={`Certificado de ${cert.name}`}
+                                alt={Certificado de ${cert.name}}
                                 className="w-16 h-12 object-cover rounded-md border mr-4 shadow-sm"
                                 onError={(e) => {
                                     e.target.onerror = null; 
@@ -638,7 +638,7 @@ const ProfileScreen = () => {
             certificates: [...prevUser.certificates, { 
                 ...newCert, 
                 id: Date.now(), 
-                imageUrl: `https://placehold.co/120x80/${randomColor}/ffffff?text=${newCert.name.split(' ')[0]}`
+                imageUrl: https://placehold.co/120x80/${randomColor}/ffffff?text=${newCert.name.split(' ')[0]}
             }]
         }));
     };
@@ -803,18 +803,17 @@ const ProfileScreen = () => {
                     </div>
                 </section>
 
-                          {/* BOTÓN DE CERRAR SESIÓN */}
-            <div className="pt-4 pb-12">
-                <button
-                    onClick={onLogout}
-                    className="w-full py-3 bg-red-600 text-white font-bold rounded-xl shadow-md hover:bg-red-700 transition"
-                >
-                    Cerrar Sesión
-                </button>
+                <div className="pt-4 pb-8">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full py-3 flex items-center justify-center bg-red-600/90 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition transform hover:scale-[1.01]"
+                    >
+                        <LogOut className="w-5 h-5 mr-2" />
+                        Cerrar Sesión
+                    </button>
+                </div>
+                
             </div>
-            
-        </div>
-
         );
     }
     
