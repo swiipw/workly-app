@@ -48,7 +48,7 @@ const FloatingAssistantButton = ({ onAssistantClick }) => {
           </button>
           
           <p className="font-semibold text-sm pr-4">
-            ¡Hola, soy Josué! Tu asistente virtual. ¿Necesitas ayuda?
+            ¡Hola, soy Josue! Tu asistente virtual. ¿Necesitas ayuda?
           </p>
         </div>
       )}
@@ -58,7 +58,7 @@ const FloatingAssistantButton = ({ onAssistantClick }) => {
         onClick={handleButtonClick} // Al hacer clic, abre el chat
         className="w-16 h-16 bg-white rounded-full shadow-xl flex items-center justify-center 
                    border-4 border-[#1ABC9C] transition-all duration-300 transform hover:scale-105"
-        aria-label="Asistente Virtual Josué"
+        aria-label="Asistente Virtual Josue"
       >
         <img 
           src="/josue.png" // Ruta de la imagen en public/
