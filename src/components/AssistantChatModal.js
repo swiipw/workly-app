@@ -16,7 +16,7 @@ const initialOptions = [
     { 
         id: 'other_contact', 
         question: "Tengo otra pregunta / Necesito contactar a alguien.", 
-        answer: "Entendido. No te preocupes. Estoy enviando un aviso a nuestro equipo. **Josué se comunicará contigo en breve** para ayudarte personalmente con tu consulta. Por favor, mantente atento a tu correo o notificaciones. ¡Gracias! 🤝" 
+        answer: "Entendido. No te preocupes. Estoy enviando un aviso a nuestro equipo. *Josue se comunicará contigo en breve* para ayudarte personalmente con tu consulta. Por favor, mantente atento a tus notificaciones. ¡Gracias! 🤝" 
     },
 ];
 
