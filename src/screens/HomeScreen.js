@@ -29,7 +29,7 @@ const HomeScreen = ({ user }) => {
         { icon: Briefcase, title: 'Empleos Guardados', value: '12', color: 'bg-[#F39C12]' }, // Accent Orange
         { icon: BookOpen, title: 'Cursos Inscritos', value: '3', color: 'bg-[#1ABC9C]' },      // Secondary Green
         { icon: Clock, title: 'Horas Aprendidas', value: '45h', color: 'bg-[#85C1E9]' },        // Light Blue
-        { icon: Zap, title: 'Aplicaciones Enviadas', value: '7', color: 'bg-[#17202A]' },        // Primary Dark
+        { icon: Zap, title: 'Postulaciones Enviadas', value: '7', color: 'bg-[#17202A]' },        // Primary Dark
     ];
 
     const quickActions = [
